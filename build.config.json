@@ -1,0 +1,36 @@
+{
+  "productName": "electron-react-vite",
+  "appId": "electron-react-vite",
+  "icon": "resources/logo.ico",
+  "copyright": "Copyright © 2022 by Ryan",
+  "files": ["resources/**/*"],
+  "extraResources": [
+    {
+      "from": "build/app.content",
+      "to": "app/app.content"
+    },
+    {
+      "from": "src/main",
+      "to": "app/main"
+    }
+  ],
+  "directories": {
+    "buildResources": "resources",
+    "output": "build/output"
+  },
+  "asar": false,
+  "nsis": {
+    "artifactName": "electron-react-vite-${version}.${ext}",
+    "perMachine": true,
+    "oneClick": false,
+    "warningsAsErrors": false,
+    "deleteAppDataOnUninstall": true,
+    "allowElevation": true,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  },
+  "win": {
+    "target": "nsis"
+  }
+}
