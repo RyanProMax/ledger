@@ -1,0 +1,36 @@
+@import '../../styles/theme.less';
+
+.ledger-title-bar {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  width: 100%;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: @color-primary;
+  position: relative;
+
+  &__main {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  &__operator {
+    position: absolute;
+    right: 14px;
+    display: flex;
+
+    &-icon {
+      margin: 0 2px;
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+}

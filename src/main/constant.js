@@ -10,7 +10,14 @@ const PAGE_BASE_URL = {
   PROD: path.resolve(BASE_URL.PROD, 'app.content')
 };
 
+const CHANNEL_NAME = {
+  MINIMIZE: 'MINIMIZE',
+  MAXIMIZE: 'MAXIMIZE',
+  CLOSE: 'CLOSE'
+};
+
 module.exports = {
   BASE_URL,
-  PAGE_BASE_URL
+  PAGE_BASE_URL,
+  CHANNEL_NAME
 };

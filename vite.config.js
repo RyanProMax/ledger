@@ -12,7 +12,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         home: resolve(__dirname, 'src/app/pages/home/index.html')
-      }
+      },
+      external: ['electron']
     }
+  },
+  optimizeDeps: {
+    exclude: ['electron']
   }
 });

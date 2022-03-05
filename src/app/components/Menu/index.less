@@ -1,0 +1,47 @@
+@import '../../styles/theme.less';
+
+.ledger-menu {
+  width: 64px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  background-color: @color-primary;
+
+  &-logo {
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    border: 3px solid skyblue;
+    position: absolute;
+    top: -30px;
+  }
+
+  &-item {
+    width: 48px;
+    height: 48px;
+    color: rgba(255, 255, 255, 0.8);
+
+    &__icon {
+      font-size: 20px;
+    }
+
+    &--active {
+      background: rgba(255, 255, 255, 0.2);
+
+      .anticon {
+        color: white !important;
+        opacity: 1;
+      }
+    }
+
+    &:nth-child(2) {
+      margin-top: 16px;
+    }
+
+    &:not(:nth-child(2)) {
+      margin-top: 6px;
+    }
+  }
+}

@@ -1,15 +1,8 @@
-import Home from './Home';
-import About from '../About';
+import Record from '../Record';
+import Classification from '../Classification';
+import { UnorderedListOutlined, FormOutlined } from '@ant-design/icons';
 
-const routes = [
-  {
-    path: '/',
-    component: Home
-  },
-  {
-    path: '/about',
-    component: About
-  }
+export const routes = [
+  { path: '/', component: Record, icon: FormOutlined },
+  { path: '/classification', component: Classification, icon: UnorderedListOutlined }
 ];
-
-export default routes;

@@ -1,0 +1,19 @@
+@import '../../styles/theme.less';
+
+.ledger-home {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
+
+  &-content-wrapper {
+    background-color: @color-primary;
+    flex: 1;
+  }
+
+  &-content {
+    background-color: #fff;
+    height: 100%;
+    border-top-left-radius: 10px;
+  }
+}

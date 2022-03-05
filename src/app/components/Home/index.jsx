@@ -1,25 +1,25 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import routes from './router';
-import { Button } from 'antd';
+import { Route, Routes } from 'react-router-dom';
+import Menu from '../Menu';
+import TitleBar from '../TitleBar';
+import './index.less';
+import { routes } from './router';
 
 export default () => {
-  const navigater = useNavigate();
-
   return (
     <>
-      <div style={{ listStyle: 'none', display: 'flex' }}>
-        <Button type="primary" onClick={() => navigater('/')}>
-          Home
-        </Button>
-        <Button type="primary" onClick={() => navigater('/about')}>
-          About
-        </Button>
+      <TitleBar />
+      <div className="ledger-home">
+        <Menu route={routes} />
+        <div className="ledger-home-content-wrapper">
+          <div className="ledger-home-content">
+            <Routes>
+              {routes.map((r, i) => (
+                <Route key={i} path={r.path} element={<r.component />} />
+              ))}
+            </Routes>
+          </div>
+        </div>
       </div>
-      <Routes>
-        {routes.map((route) => (
-          <Route exact key={route.path} path={route.path} element={<route.component />} />
-        ))}
-      </Routes>
     </>
   );
 };
