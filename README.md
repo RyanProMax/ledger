@@ -1,3 +1,3 @@
-# Electron-React-Vite
+# Ledger
 
-一个基于 Vite + React 构建的 Electron MPA 模板 🚀
+一款基于 Electron + Vite + React 构建的记账软件 🚀

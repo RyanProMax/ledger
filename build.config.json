@@ -1,6 +1,6 @@
 {
-  "productName": "electron-react-vite",
-  "appId": "electron-react-vite",
+  "productName": "Ledger",
+  "appId": "Ledger",
   "icon": "resources/logo.ico",
   "copyright": "Copyright © 2022 by Ryan",
   "files": ["resources/**/*"],
@@ -20,7 +20,7 @@
   },
   "asar": false,
   "nsis": {
-    "artifactName": "electron-react-vite-${version}.${ext}",
+    "artifactName": "Ledger-${version}.${ext}",
     "perMachine": true,
     "oneClick": false,
     "warningsAsErrors": false,
