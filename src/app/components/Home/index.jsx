@@ -1,11 +1,25 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import './index.css'
-import App from '../../components/Home/App'
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import routes from './router';
+import { Button } from 'antd';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+export default () => {
+  const navigater = useNavigate();
+
+  return (
+    <>
+      <div style={{ listStyle: 'none', display: 'flex' }}>
+        <Button type="primary" onClick={() => navigater('/')}>
+          Home
+        </Button>
+        <Button type="primary" onClick={() => navigater('/about')}>
+          About
+        </Button>
+      </div>
+      <Routes>
+        {routes.map((route) => (
+          <Route exact key={route.path} path={route.path} element={<route.component />} />
+        ))}
+      </Routes>
+    </>
+  );
+};

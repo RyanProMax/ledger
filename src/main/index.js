@@ -11,6 +11,6 @@ const { parsePageUrl } = require('./utils');
       preload: path.join(__dirname, 'preload.js')
     }
   });
-  mainWindow.loadURL(parsePageUrl('index'));
+  mainWindow.loadURL(parsePageUrl('home'));
   mainWindow.webContents.openDevTools();
 })();
