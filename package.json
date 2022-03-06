@@ -31,10 +31,12 @@
     "fs-extra": "^10.0.1",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
+    "lowdb-node": "^3.0.2",
     "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.2.2",
+    "uuid": "^8.3.2",
     "vite": "^2.8.0",
     "vite-plugin-imp": "^2.1.6"
   }

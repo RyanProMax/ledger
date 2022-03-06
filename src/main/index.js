@@ -1,10 +1,13 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { parsePageUrl } = require('./utils');
-const { CHANNEL_NAME } = require('./constant');
+const { registerMainIPCEvent } = require('./ipcEvent');
+const { initStore } = require('./store');
+const { AppInfo, initAppData } = require('./app');
 
 !(async () => {
   await app.whenReady();
+  const appInfo = AppInfo.getInstance();
 
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -19,14 +22,9 @@ const { CHANNEL_NAME } = require('./constant');
   mainWindow.setMenu(null);
   mainWindow.loadURL(parsePageUrl('home'));
   mainWindow.webContents.openDevTools();
+  appInfo.windowStore.set('mainWindow', mainWindow);
 
-  ipcMain.handle(CHANNEL_NAME.MINIMIZE, () => mainWindow.minimize());
-  ipcMain.handle(CHANNEL_NAME.MAXIMIZE, () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.restore();
-    } else {
-      mainWindow.maximize();
-    }
-  });
-  ipcMain.handle(CHANNEL_NAME.CLOSE, () => mainWindow.close());
+  initAppData();
+  registerMainIPCEvent();
+  await initStore();
 })();

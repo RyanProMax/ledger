@@ -13,7 +13,8 @@ const PAGE_BASE_URL = {
 const CHANNEL_NAME = {
   MINIMIZE: 'MINIMIZE',
   MAXIMIZE: 'MAXIMIZE',
-  CLOSE: 'CLOSE'
+  CLOSE: 'CLOSE',
+  GET_USER_DATA_PATH: 'GET_USER_DATA_PATH'
 };
 
 module.exports = {
