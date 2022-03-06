@@ -2,7 +2,7 @@ const path = require('path');
 const fe = require('fs-extra');
 const { AppInfo } = require('./app');
 const { Low, JSONFile } = require('lowdb-node');
-const { v4 } = require('uuid');
+const { DEFAULT_DATA, STORE_NAME } = require('./constant');
 
 let STORE_PATH;
 
@@ -15,24 +15,34 @@ const initStore = async () => {
     fe.mkdirSync(STORE_PATH);
   }
 
-  await initUserData();
+  const initStoreDataList = [STORE_NAME.USER, STORE_NAME.CLASSIFICATION];
+  await Promise.all(initStoreDataList.map((name) => initStoreData(name)));
 };
 
-const initUserData = async () => {
-  const file = path.resolve(STORE_PATH, 'user.json');
+// STORE_NAME的属性名须与DEFAULT_DATA的保持一致对应
+const initStoreData = async (storeName) => {
+  const file = path.resolve(STORE_PATH, STORE_NAME[storeName]);
   const adapter = new JSONFile(file);
-  const userDb = new Low(adapter);
-  await userDb.read();
-  userDb.data ||= {
-    id: v4(),
-    nickName: '',
-    realName: '',
-    sex: -1,
-    birthDay: 0
-  };
-  await userDb.write();
+  const db = new Low(adapter);
+  await db.read();
+  db.data ||= DEFAULT_DATA[storeName];
+  await db.write();
+};
+
+const getStoreData = async (storeName) => {
+  try {
+    const file = path.resolve(STORE_PATH, STORE_NAME[storeName]);
+    const adapter = new JSONFile(file);
+    const db = new Low(adapter);
+    await db.read();
+    db.data ||= DEFAULT_DATA[storeName];
+    return { status: 1, error: null, data: db.data };
+  } catch (e) {
+    return { status: 0, error: e, data: null };
+  }
 };
 
 module.exports = {
-  initStore
+  initStore,
+  getStoreData
 };
