@@ -15,7 +15,7 @@ const { Column } = Table;
 export default function Classification({ setLoading }) {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.classification);
-  const [editting, setEditting] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [tempData, setTempData] = useState([]);
   const [inputVisible, setInputVisible] = useState({});
 
@@ -47,12 +47,12 @@ export default function Classification({ setLoading }) {
   };
 
   const handleEdit = () => {
-    setEditting(true);
+    setEditing(true);
     setTempData(cloneDeep(data));
   };
 
   const handleCancel = () => {
-    setEditting(false);
+    setEditing(false);
     setTempData([]);
   };
 
@@ -95,7 +95,7 @@ export default function Classification({ setLoading }) {
 
   // 初始化操作项
   const handleOperator = () => {
-    if (!editting) {
+    if (!editing) {
       const operatorData = [
         { ...OPERATOR.EDIT, clickEvent: handleEdit }
       ];
@@ -130,14 +130,14 @@ export default function Classification({ setLoading }) {
         rowKey="id"
         bordered
         expandable={{ showExpandColumn: false }}
-        dataSource={editting ? tempData : data}
+        dataSource={editing ? tempData : data}
         pagination={false}
       >
         <Column
           title="分类"
           dataIndex="name"
           key="name"
-          render={(name, record, index) => (editting ? (
+          render={(name, record, index) => (editing ? (
             <Input
               value={name}
               status={!name ? 'error' : ''}
@@ -157,7 +157,7 @@ export default function Classification({ setLoading }) {
           title="类型"
           dataIndex="type"
           key="type"
-          render={(type, record, index) => (editting ? (
+          render={(type, record, index) => (editing ? (
             <Select
               defaultValue={type}
               options={[{ label: '收入', value: 0 }, { label: '支出', value: 1 }]}
@@ -177,14 +177,15 @@ export default function Classification({ setLoading }) {
           dataIndex="children"
           key="children"
           render={(children, record, index) => {
-            if (!children.length && !editting) { return '-'; }
+            if (!children) return null;
+            if (!children.length && !editing) return '-';
             return (
               <>
                 {children.map((t, i) => (
                   <Tag
                     key={t.id}
                     color="geekblue"
-                    closable={editting}
+                    closable={editing}
                     onClose={(e) => {
                       e.preventDefault();
                       setTempData((oldData) => {
@@ -197,7 +198,7 @@ export default function Classification({ setLoading }) {
                     {t.name}
                   </Tag>
                 ))}
-                {editting && (
+                {editing && (
                   inputVisible[index] && inputVisible[index].isInput ? (
                     <Input
                       type="text"
@@ -236,7 +237,7 @@ export default function Classification({ setLoading }) {
             );
           }}
         />
-        {editting && (
+        {editing && (
           <Column
             title="操作"
             key="action"

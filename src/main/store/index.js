@@ -29,7 +29,7 @@ const initStore = async () => {
   appInfo.constant.set('STORE_PATH', STORE_PATH);
   fse.ensureDirSync(STORE_PATH);
 
-  const initStoreDataList = [STORE_NAME.USER, STORE_NAME.CLASSIFICATION];
+  const initStoreDataList = [STORE_NAME.USER, STORE_NAME.CLASSIFICATION, STORE_NAME.WALLET];
   await Promise.all(initStoreDataList.map((name) => initStoreData(name)));
 };
 
