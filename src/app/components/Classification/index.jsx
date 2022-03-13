@@ -137,7 +137,6 @@ export default function Classification({ setLoading }) {
           title="分类"
           dataIndex="name"
           key="name"
-          editable={editting}
           render={(name, record, index) => (editting ? (
             <Input
               value={name}

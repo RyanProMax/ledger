@@ -1,14 +1,14 @@
 const path = require('path');
 const fse = require('fs-extra');
 const { Low, JSONFile } = require('lowdb-node');
-const { AppInfo } = require('./app');
-const { DEFAULT_DATA, STORE_NAME, STORE_FILE_NAME } = require('./constant');
+const { AppInfo } = require('../app');
+const { STORE_NAME, STORE_FILE_NAME } = require('../constant');
+const DEFAULT_DATA = require('./model');
 
 let STORE_PATH;
 
 /**
  * @description 初始化数据库数据
- * STORE_NAME的属性名须与DEFAULT_DATA的保持一致对应
  */
 const initStoreData = async (storeName) => {
   const file = path.resolve(STORE_PATH, STORE_FILE_NAME[storeName]);
