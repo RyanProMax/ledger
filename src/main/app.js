@@ -5,6 +5,7 @@ class AppInfo {
     this.constant = new Map();
     this.windowStore = new Map();
   }
+
   static getInstance() {
     if (!this.instance) {
       this.instance = new AppInfo();

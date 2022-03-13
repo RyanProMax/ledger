@@ -5,7 +5,7 @@ const { registerMainIPCEvent } = require('./ipcEvent');
 const { initStore } = require('./store');
 const { AppInfo, initAppData } = require('./app');
 
-const main = async () => {
+const initMain = async () => {
   await app.whenReady();
   const appInfo = AppInfo.getInstance();
 
@@ -29,4 +29,4 @@ const main = async () => {
   await initStore();
 };
 
-main();
+initMain();

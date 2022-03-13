@@ -2,9 +2,9 @@ import { Route, Routes } from 'react-router-dom';
 import Menu from '../Menu';
 import TitleBar from '../TitleBar';
 import './index.less';
-import { routes } from './router';
+import routes from './router';
 
-export default () => {
+export default function Home() {
   return (
     <>
       <TitleBar />
@@ -22,4 +22,4 @@ export default () => {
       </div>
     </>
   );
-};
+}

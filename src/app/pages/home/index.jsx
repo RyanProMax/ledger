@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter } from 'react-router-dom';
 import App from '../../components/Home';
+import PageWrapper from '../../components/PageWrapper';
 import './index.less';
 
 ReactDOM.render(
-  <HashRouter>
+  <PageWrapper>
     <App />
-  </HashRouter>,
+  </PageWrapper>,
   document.getElementById('root')
 );

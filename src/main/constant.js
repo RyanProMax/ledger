@@ -1,5 +1,6 @@
 const path = require('path');
 const { v4 } = require('uuid');
+const STORE_NAME = require('../global/StoreName.json');
 
 const BASE_URL = {
   DEV: 'http://localhost:3000',
@@ -15,13 +16,7 @@ const CHANNEL_NAME = {
   MINIMIZE: 'MINIMIZE',
   MAXIMIZE: 'MAXIMIZE',
   CLOSE: 'CLOSE',
-  GET_USER_DATA: 'GET_USER_DATA',
-  GET_CLASSIFICATION_DATA: 'GET_CLASSIFICATION_DATA'
-};
-
-const STORE_NAME = {
-  USER: 'USER',
-  CLASSIFICATION: 'CLASSIFICATION'
+  GET_STORE_DATA: 'GET_STORE_DATA'
 };
 
 const STORE_FILE_NAME = {
@@ -30,7 +25,9 @@ const STORE_FILE_NAME = {
 };
 
 const DEFAULT_DATA = {
-  USER: { id: v4(), nickName: '', realName: '', sex: -1, birthDay: 0 },
+  USER: {
+    id: v4(), nickName: '', realName: '', sex: -1, birthDay: 0
+  },
   CLASSIFICATION: [
     {
       id: v4(),
@@ -51,10 +48,18 @@ const DEFAULT_DATA = {
         }
       ]
     },
-    { id: v4(), name: '交通', type: 1, children: [] },
-    { id: v4(), name: '日常用品', type: 1, children: [] },
-    { id: v4(), name: '工资', type: 0, children: [] },
-    { id: v4(), name: '股票', type: 0, children: [] }
+    {
+      id: v4(), name: '交通', type: 1, children: []
+    },
+    {
+      id: v4(), name: '日常用品', type: 1, children: []
+    },
+    {
+      id: v4(), name: '工资', type: 0, children: []
+    },
+    {
+      id: v4(), name: '股票', type: 0, children: []
+    }
   ]
 };
 

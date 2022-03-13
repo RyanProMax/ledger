@@ -1,5 +1,8 @@
 {
   "extends": [
     "@ryanpromax"
-  ]
+  ],
+  "rules": {
+    "react/no-array-index-key": 0
+  }
 }

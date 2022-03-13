@@ -1,6 +1,6 @@
 const { ipcMain } = require('electron');
 const { AppInfo } = require('./app');
-const { CHANNEL_NAME, STORE_NAME } = require('./constant');
+const { CHANNEL_NAME } = require('./constant');
 const { getStoreData } = require('./store');
 
 const registerMainIPCEvent = () => {
@@ -18,10 +18,7 @@ const registerMainIPCEvent = () => {
   ipcMain.handle(CHANNEL_NAME.CLOSE, () => mainWindow.close());
 
   // get data
-  ipcMain.handle(CHANNEL_NAME.GET_USER_DATA, () => getStoreData(STORE_NAME.USER));
-  ipcMain.handle(CHANNEL_NAME.GET_CLASSIFICATION_DATA, () =>
-    getStoreData(STORE_NAME.CLASSIFICATION)
-  );
+  ipcMain.handle(CHANNEL_NAME.GET_STORE_DATA, (event, ...args) => getStoreData(...args));
 };
 
 module.exports = {
