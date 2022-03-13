@@ -32,6 +32,7 @@
     "fs-extra": "^10.0.1",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
+    "lodash-es": "^4.17.21",
     "lowdb-node": "^3.0.2",
     "prettier": "^2.5.1",
     "react": "^17.0.2",

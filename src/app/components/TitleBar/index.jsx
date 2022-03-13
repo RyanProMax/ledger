@@ -1,18 +1,26 @@
 import './index.less';
-import { MinusOutlined, PlusOutlined, BorderOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  MinusOutlined, BorderOutlined, CloseOutlined
+} from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 import Icon from '../Icon';
 
-export default () => {
+export default function TitleBar() {
   const handleMinimize = () => window.electron.MINIMIZE();
   const handleMaximize = () => window.electron.MAXIMIZE();
   const handleClose = () => window.electron.CLOSE();
 
+  const activeOperator = useSelector((state) => state.operator);
+
   return (
     <div className="ledger-title-bar">
       <div className="ledger-title-bar__main">
-        <Icon>
-          <PlusOutlined className="ledger-title-bar__icon" />
-        </Icon>
+        {activeOperator.map((v) => (
+          <Icon key={v.id} onClick={v.clickEvent}>
+            <v.icon className="ledger-title-bar__icon" />
+          </Icon>
+        ))}
+
       </div>
       <div className="ledger-title-bar__operator">
         <Icon className="ledger-title-bar__operator-icon" onClick={handleMinimize}>
@@ -27,4 +35,4 @@ export default () => {
       </div>
     </div>
   );
-};
+}

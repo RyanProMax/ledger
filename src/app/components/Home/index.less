@@ -13,7 +13,21 @@
 
   &-content {
     background-color: #f6f6f6;
-    height: 100%;
     border-top-left-radius: 10px;
+    overflow: hidden;
+  }
+
+  &-content-component {
+    padding: 10px;
+    height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+    box-sizing: border-box;
+    overflow-y: auto;
+
+    .ledger-home-component__general {
+      background-color: #fff;
+      padding: 16px;
+      border: 1px solid #f0f0f0;
+    }
   }
 }

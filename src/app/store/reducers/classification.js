@@ -1,4 +1,4 @@
-import { ACTION_NAME } from '../constant';
+import { ACTION_NAME } from '../../constant';
 
 const initState = [];
 

@@ -16,7 +16,8 @@ const CHANNEL_NAME = {
   MINIMIZE: 'MINIMIZE',
   MAXIMIZE: 'MAXIMIZE',
   CLOSE: 'CLOSE',
-  GET_STORE_DATA: 'GET_STORE_DATA'
+  GET_STORE_DATA: 'GET_STORE_DATA',
+  SET_STORE_DATA: 'SET_STORE_DATA'
 };
 
 const STORE_FILE_NAME = {
@@ -36,15 +37,11 @@ const DEFAULT_DATA = {
       children: [
         {
           id: v4(),
-          name: '日常伙食',
-          type: 1,
-          children: []
+          name: '日常伙食'
         },
         {
           id: v4(),
-          name: '大快朵颐',
-          type: 1,
-          children: []
+          name: '大快朵颐'
         }
       ]
     },
