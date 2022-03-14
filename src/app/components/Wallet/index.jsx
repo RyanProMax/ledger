@@ -9,12 +9,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   useCallback, useEffect, useMemo, useState
 } from 'react';
-import { cloneDeep } from 'lodash-es';
 import { v4 } from 'uuid';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { arrayMoveImmutable } from 'array-move';
 import { ACTION_NAME, OPERATOR } from '../../constant';
-import STORE_NAME from '../../../global/StoreName.json';
+import STORE from '../../../global/Store.json';
 
 const { Column } = Table;
 
@@ -35,7 +34,7 @@ export default function Wallet({ setLoading }) {
     if (data.length && !force) return;
     setLoading(true);
     try {
-      const { status, data: walletData, error } = await window.electron.GET_STORE_DATA(STORE_NAME.WALLET);
+      const { status, data: walletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME);
       if (!status) {
         dispatch({
           type: ACTION_NAME.SET_WALLET,
@@ -62,7 +61,7 @@ export default function Wallet({ setLoading }) {
 
   const handleEdit = () => {
     setEditing(true);
-    setTempData(cloneDeep(data));
+    setTempData(data.map((row, index) => ({ ...row, index })));
   };
 
   const handleCancel = () => {
@@ -82,7 +81,7 @@ export default function Wallet({ setLoading }) {
     if (newData.every((row) => row.name.trim())) {
       setLoading(true);
       await window.electron.SET_STORE_DATA({
-        storeName: STORE_NAME.WALLET,
+        storeFileName: STORE.WALLET.FILE_NAME,
         data: newData
       });
       await fetchWallet(true);

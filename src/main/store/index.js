@@ -2,7 +2,7 @@ const path = require('path');
 const fse = require('fs-extra');
 const { Low, JSONFile } = require('lowdb-node');
 const { AppInfo } = require('../app');
-const { STORE_NAME, STORE_FILE_NAME } = require('../constant');
+const STORE = require('../../global/Store.json');
 const DEFAULT_DATA = require('./model');
 
 let STORE_PATH;
@@ -10,12 +10,12 @@ let STORE_PATH;
 /**
  * @description 初始化数据库数据
  */
-const initStoreData = async (storeName) => {
-  const file = path.resolve(STORE_PATH, STORE_FILE_NAME[storeName]);
+const initStoreDefaultData = async (storeFileName) => {
+  const file = path.resolve(STORE_PATH, storeFileName);
   const adapter = new JSONFile(file);
   const db = new Low(adapter);
   await db.read();
-  db.data = db.data || DEFAULT_DATA[storeName];
+  db.data = db.data || DEFAULT_DATA[storeFileName];
   await db.write();
 };
 
@@ -29,20 +29,20 @@ const initStore = async () => {
   appInfo.constant.set('STORE_PATH', STORE_PATH);
   fse.ensureDirSync(STORE_PATH);
 
-  const initStoreDataList = [STORE_NAME.USER, STORE_NAME.CLASSIFICATION, STORE_NAME.WALLET];
-  await Promise.all(initStoreDataList.map((name) => initStoreData(name)));
+  const storeFileList = [STORE.USER.FILE_NAME, STORE.CLASSIFICATION.FILE_NAME, STORE.WALLET.FILE_NAME];
+  await Promise.all(storeFileList.map((storeFileName) => initStoreDefaultData(storeFileName)));
 };
 
 /**
  * @description 获取数据库数据
  */
-const getStoreData = async (storeName) => {
+const getStoreData = async (storeFileName) => {
   try {
-    const file = path.resolve(STORE_PATH, STORE_FILE_NAME[storeName]);
+    const file = path.resolve(STORE_PATH, storeFileName);
     const adapter = new JSONFile(file);
     const db = new Low(adapter);
     await db.read();
-    db.data = db.data || DEFAULT_DATA[storeName];
+    db.data = db.data || DEFAULT_DATA[storeFileName];
     return { status: 0, error: null, data: db.data };
   } catch (e) {
     return { status: 1, error: e.message, data: null };
@@ -52,9 +52,9 @@ const getStoreData = async (storeName) => {
 /**
  * @description 设置数据库数据
  */
-const setStoreData = async ({ storeName, data }) => {
+const setStoreData = async ({ storeFileName, data }) => {
   try {
-    const file = path.resolve(STORE_PATH, STORE_FILE_NAME[storeName]);
+    const file = path.resolve(STORE_PATH, storeFileName);
     const adapter = new JSONFile(file);
     const db = new Low(adapter);
     await db.read();

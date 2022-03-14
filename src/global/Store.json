@@ -1,0 +1,18 @@
+{
+  "USER": {
+    "NAME": "USER",
+    "FILE_NAME": "user.json"
+  },
+  "CLASSIFICATION": {
+    "NAME": "CLASSIFICATION",
+    "FILE_NAME": "classification.json"
+  },
+  "WALLET": {
+    "NAME": "WALLET",
+    "FILE_NAME": "wallet.json"
+  },
+  "RECORD": {
+    "NAME": "RECORD",
+    "FILE_NAME": "record_${year}.json"
+  }
+}

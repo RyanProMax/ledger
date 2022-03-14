@@ -1,4 +1,4 @@
-const { STORE_NAME } = require('../../constant');
+const STORE = require('../../../global/Store.json');
 
 /**
  * @description default storage data
@@ -8,7 +8,7 @@ const CLASSIFICATION = require('./classification');
 const WALLET = require('./wallet');
 
 module.exports = {
-  [STORE_NAME.USER]: USER,
-  [STORE_NAME.CLASSIFICATION]: CLASSIFICATION,
-  [STORE_NAME.WALLET]: WALLET
+  [STORE.USER.FILE_NAME]: USER,
+  [STORE.CLASSIFICATION.FILE_NAME]: CLASSIFICATION,
+  [STORE.WALLET.FILE_NAME]: WALLET
 };

@@ -1,5 +1,4 @@
 const path = require('path');
-const STORE_NAME = require('../global/StoreName.json');
 
 const BASE_URL = {
   DEV: 'http://localhost:3000',
@@ -19,16 +18,8 @@ const CHANNEL_NAME = {
   SET_STORE_DATA: 'SET_STORE_DATA'
 };
 
-const STORE_FILE_NAME = {
-  [STORE_NAME.USER]: 'user.json',
-  [STORE_NAME.CLASSIFICATION]: 'classification.json',
-  [STORE_NAME.WALLET]: 'wallet.json'
-};
-
 module.exports = {
   BASE_URL,
   PAGE_BASE_URL,
-  CHANNEL_NAME,
-  STORE_NAME,
-  STORE_FILE_NAME
+  CHANNEL_NAME
 };

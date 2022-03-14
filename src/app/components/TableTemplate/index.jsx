@@ -1,12 +1,12 @@
 import {
-  message, Popconfirm, Select, Table, Tag
+  message, Popconfirm, Table, Tag
 } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import './index.less';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { ACTION_NAME, OPERATOR } from '../../constant';
-import STORE_NAME from '../../../global/StoreName.json';
+import STORE from '../../../global/Store.json';
 
 const { Column } = Table;
 
@@ -19,7 +19,7 @@ export default function Classification({ setLoading }) {
     if (data.length && !force) return;
     setLoading(true);
     try {
-      const { status, data: classData, error } = await window.electron.GET_STORE_DATA(STORE_NAME.CLASSIFICATION);
+      const { status, data: classData, error } = await window.electron.GET_STORE_DATA(STORE.CLASSIFICATION.FILE_NAME);
       if (!status) {
         dispatch({
           type: ACTION_NAME.SET_CLASSIFICATION,
