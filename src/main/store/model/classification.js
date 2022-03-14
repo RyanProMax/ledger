@@ -9,6 +9,8 @@ class Classification {
     // 收入为0，支出为1
     this.type = type === undefined ? 1 : type;
     this.children = children || [];
+    this.create_time = Date.now();
+    this.update_time = Date.now();
   }
 }
 

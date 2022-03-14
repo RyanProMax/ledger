@@ -9,6 +9,8 @@ class User {
     this.realName = realName || '';
     this.sex = sex || -1;
     this.birthDay = birthDay || Date.now();
+    this.create_time = Date.now();
+    this.update_time = Date.now();
   }
 }
 

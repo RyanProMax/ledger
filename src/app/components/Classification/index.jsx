@@ -140,7 +140,6 @@ export default function Classification({ setLoading }) {
           render={(name, record, index) => (editing ? (
             <Input
               value={name}
-              status={!name ? 'error' : ''}
               placeholder="分类名不能为空"
               onChange={(e) => {
                 setTempData((oldData) => {

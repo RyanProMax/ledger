@@ -1,10 +1,14 @@
-import { UnorderedListOutlined, FormOutlined, WalletOutlined } from '@ant-design/icons';
+import {
+  BarChartOutlined, TagsOutlined, DollarCircleOutlined, CreditCardOutlined
+} from '@ant-design/icons';
+import Dashboard from '../Dashboard';
 import Record from '../Record';
 import Classification from '../Classification';
 import Wallet from '../Wallet';
 
 export default [
-  { path: '/', component: Record, icon: FormOutlined },
-  { path: '/classification', component: Classification, icon: UnorderedListOutlined },
-  { path: '/wallet', component: Wallet, icon: WalletOutlined }
+  { path: '/', component: Dashboard, icon: BarChartOutlined },
+  { path: '/record', component: Record, icon: DollarCircleOutlined },
+  { path: '/classification', component: Classification, icon: TagsOutlined },
+  { path: '/wallet', component: Wallet, icon: CreditCardOutlined }
 ];

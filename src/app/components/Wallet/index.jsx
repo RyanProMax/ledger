@@ -6,7 +6,9 @@ import {
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import './index.less';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import {
+  useCallback, useEffect, useMemo, useState
+} from 'react';
 import { cloneDeep } from 'lodash-es';
 import { v4 } from 'uuid';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
@@ -26,6 +28,7 @@ export default function Wallet({ setLoading }) {
   const data = useSelector((state) => state.wallet);
   const [editing, setEditing] = useState(false);
   const [tempData, setTempData] = useState([]);
+  const sortData = useMemo(() => data.map((row, index) => ({ ...row, index })), [data]);
 
   // 请求数据
   const fetchWallet = async (force = false) => {
@@ -50,7 +53,10 @@ export default function Wallet({ setLoading }) {
 
   const handleAdd = () => {
     setTempData((oldData) => [...oldData, {
-      id: v4(), name: '', balance: 0
+      id: v4(),
+      name: '',
+      balance: 0,
+      index: tempData.length
     }]);
   };
 
@@ -72,12 +78,12 @@ export default function Wallet({ setLoading }) {
     });
   };
 
-  const handleSubmit = async () => {
-    if (tempData.every((row) => row.name.trim())) {
+  const handleSubmit = (newData) => async () => {
+    if (newData.every((row) => row.name.trim())) {
       setLoading(true);
       await window.electron.SET_STORE_DATA({
         storeName: STORE_NAME.WALLET,
-        data: tempData
+        data: newData
       });
       await fetchWallet(true);
       handleCancel();
@@ -99,7 +105,7 @@ export default function Wallet({ setLoading }) {
     } else {
       const operatorData = [
         { ...OPERATOR.ADD, clickEvent: handleAdd },
-        { ...OPERATOR.FINISH, clickEvent: handleSubmit },
+        { ...OPERATOR.FINISH, clickEvent: handleSubmit(tempData) },
         { ...OPERATOR.CANCEL, clickEvent: handleCancel }
       ];
       dispatch({
@@ -112,30 +118,29 @@ export default function Wallet({ setLoading }) {
   // sortable method
   const onSortEnd = ({ oldIndex, newIndex }) => {
     if (oldIndex !== newIndex) {
-      const newData = arrayMoveImmutable([].concat(tempData), oldIndex, newIndex).filter(
+      setLoading(true);
+      const newData = arrayMoveImmutable([].concat(sortData), oldIndex, newIndex).filter(
         (el) => !!el
       );
-      setTempData(newData);
+      handleSubmit(newData)();
     }
   };
 
-  function DraggableContainer(props) {
-    return (
-      <SortableBody
-        useDragHandle
-        disableAutoscroll
-        helperClass="row-dragging"
-        onSortEnd={onSortEnd}
-        {...props}
-      />
-    );
-  }
+  const DraggableContainer = useCallback((props) => (
+    <SortableBody
+      useDragHandle
+      disableAutoscroll
+      helperClass="row-dragging"
+      onSortEnd={onSortEnd}
+      {...props}
+    />
+  ), [onSortEnd]);
 
-  function DraggableBodyRow({ className, style, ...restProps }) {
+  const DraggableBodyRow = useCallback(({ className, style, ...restProps }) => {
     // function findIndex base on Table rowKey props and should always be a right array index
-    const index = tempData.findIndex((x) => x.index === restProps['data-row-key']);
+    const index = sortData.findIndex((x) => x.index === restProps['data-row-key']);
     return <SortableItem index={index} {...restProps} />;
-  }
+  }, [sortData]);
 
   useEffect(() => {
     handleOperator();
@@ -151,16 +156,16 @@ export default function Wallet({ setLoading }) {
         rowKey="index"
         bordered
         expandable={{ showExpandColumn: false }}
-        dataSource={editing ? tempData : data}
+        dataSource={editing ? tempData : sortData}
         pagination={false}
-        components={{
+        components={editing ? null : {
           body: {
             wrapper: DraggableContainer,
             row: DraggableBodyRow
           }
         }}
       >
-        {editing
+        {!editing
           && (
             <Column
               title="排序"
@@ -179,7 +184,6 @@ export default function Wallet({ setLoading }) {
           render={(name, record, index) => (editing ? (
             <Input
               value={name}
-              status={!name ? 'error' : ''}
               placeholder="账户名不能为空"
               onChange={(e) => {
                 setTempData((oldData) => {
