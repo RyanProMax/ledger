@@ -19,7 +19,7 @@ export default function Classification({ setLoading }) {
     if (data.length && !force) return;
     setLoading(true);
     try {
-      const { status, data: classData, error } = await window.electron.GET_STORE_DATA(STORE.CLASSIFICATION.FILE_NAME);
+      const { status, data: classData, error } = await window.electron.GET_STORE_DATA(STORE.CLASSIFICATION.FILE_NAME, STORE.CLASSIFICATION.FILE_NAME);
       if (!status) {
         dispatch({
           type: ACTION_NAME.SET_CLASSIFICATION,

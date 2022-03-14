@@ -34,7 +34,7 @@ export default function Wallet({ setLoading }) {
     if (data.length && !force) return;
     setLoading(true);
     try {
-      const { status, data: walletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME);
+      const { status, data: walletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME, STORE.WALLET.FILE_NAME);
       if (!status) {
         dispatch({
           type: ACTION_NAME.SET_WALLET,

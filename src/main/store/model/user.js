@@ -3,7 +3,7 @@ const { v4 } = require('uuid');
 class User {
   constructor({
     id, nickName, realName, sex, birthDay
-  }) {
+  } = {}) {
     this.id = id || v4();
     this.nickName = nickName || '';
     this.realName = realName || '';
@@ -14,4 +14,7 @@ class User {
   }
 }
 
-module.exports = new User({});
+module.exports = {
+  CLASS: User,
+  DATA: new User()
+};

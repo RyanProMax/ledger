@@ -25,18 +25,14 @@
     "babel-eslint": "^10.1.0",
     "classnames": "^2.3.1",
     "cross-env": "^7.0.3",
-    "dayjs": "^1.10.8",
     "electron": "^17.1.0",
     "electron-builder": "^22.14.13",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "fs-extra": "^10.0.1",
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
     "lodash-es": "^4.17.21",
-    "lowdb-node": "^3.0.2",
-    "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
@@ -44,8 +40,13 @@
     "react-sortable-hoc": "^2.0.0",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
-    "uuid": "^8.3.2",
     "vite": "^2.8.0",
     "vite-plugin-imp": "^2.1.6"
+  },
+  "dependencies": {
+    "dayjs": "^1.10.8",
+    "fs-extra": "^10.0.1",
+    "lowdb-node": "^3.0.2",
+    "uuid": "^8.3.2"
   }
 }

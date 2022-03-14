@@ -1,7 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 const path = require('path');
 const { CHANNEL_NAME } = require('./constant');
-const packageJson = require('../../package.json');
+const { isDev } = require('./utils');
+const packageJson = isDev ? require('../../package.json') : require('../package.json');
 
 /**
  * @description 往渲染进程注入主进程方法

@@ -12,6 +12,10 @@
     {
       "from": "src/main",
       "to": "app/main"
+    },
+    {
+      "from": "src/global",
+      "to": "app/global"
     }
   ],
   "directories": {
