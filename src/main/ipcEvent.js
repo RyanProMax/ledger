@@ -1,26 +1,77 @@
-const { ipcMain } = require('electron');
+const { ipcMain, BrowserWindow } = require('electron');
+const path = require('path');
 const { AppInfo } = require('./app');
 const { CHANNEL_NAME } = require('./constant');
 const { getStoreData, setStoreData } = require('./store');
+const { parsePageUrl } = require('./utils');
 
 const registerMainIPCEvent = () => {
   const appInfo = AppInfo.getInstance();
-  const mainWindow = appInfo.windowStore.get('mainWindow');
 
-  ipcMain.handle(CHANNEL_NAME.MINIMIZE, () => mainWindow.minimize());
-  ipcMain.handle(CHANNEL_NAME.MAXIMIZE, () => {
-    if (mainWindow.isMaximized()) {
-      mainWindow.restore();
+  // window-event
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.MINIMIZE, (event, windowName) => appInfo.windowStore.get(windowName).minimize());
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.MAXIMIZE, (event, windowName) => {
+    const targetWindow = appInfo.windowStore.get(windowName);
+    if (targetWindow.isMaximized()) {
+      targetWindow.restore();
     } else {
-      mainWindow.maximize();
+      targetWindow.maximize();
     }
   });
-  ipcMain.handle(CHANNEL_NAME.CLOSE, () => mainWindow.close());
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.CLOSE, (event, windowName) => {
+    appInfo.windowStore.get(windowName).close();
+    appInfo.windowStore.delete(windowName);
+  });
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.HIDE, (event, windowName) => appInfo.windowStore.get(windowName).hide());
 
   // get data
-  ipcMain.handle(CHANNEL_NAME.GET_STORE_DATA, (event, ...args) => getStoreData(...args));
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.GET_STORE_DATA, (event, ...args) => getStoreData(...args));
   // set data
-  ipcMain.handle(CHANNEL_NAME.SET_STORE_DATA, (event, ...args) => setStoreData(...args));
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.SET_STORE_DATA, (event, ...args) => setStoreData(...args));
+
+  // create sub-window
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.INIT_SUB_WINDOW, async (events, windowName, windowPage, ...args) => {
+    let subWindow = appInfo.windowStore.get(windowName);
+    if (!subWindow) {
+      subWindow = new BrowserWindow({
+        width: 600,
+        height: 450,
+        minWidth: 600,
+        minHeight: 450,
+        frame: false,
+        webPreferences: { preload: path.join(__dirname, 'preload.js') }
+      });
+      subWindow.setMenu(null);
+      subWindow.loadURL(parsePageUrl(windowPage));
+      subWindow.webContents.openDevTools();
+      appInfo.windowStore.set(windowName, subWindow);
+      // 如果创建窗口时携带参数一并发送，节省一次IPC通信
+      if (args && args.length) {
+        subWindow.webContents.on('did-finish-load', () => {
+          subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, ...args);
+        });
+      }
+    } else {
+      if (!subWindow.isVisible()) {
+        subWindow.show();
+      }
+      if (args && args.length) {
+        subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, ...args);
+      }
+    }
+    return true;
+  });
+  // renderer send message
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.SEND_MESSAGE, (event, windowName, ...args) => {
+    try {
+      const targetWindow = appInfo.windowStore.get(windowName);
+      if (!targetWindow || !args || !args.length) return false;
+      targetWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, ...args);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  });
 };
 
 module.exports = {

@@ -5,18 +5,16 @@ class Record {
   constructor({ year } = {}) {
     this.id = v4();
     this.year = year || dayjs().year();
+    this.total = 0;
     this.income = 0;
     this.spending = 0;
-    this.isYear = true;
-    this.data = new Array(12).fill(0).map((_, index) => ({
+    this.statistic = new Array(12).fill(0).map((_, index) => ({
       month: index + 1,
-      isMonth: true,
+      total: 0,
       income: 0,
       spending: 0,
-      data: []
+      daily: {}
     }));
-    this.create_time = Date.now();
-    this.update_time = Date.now();
   }
 }
 

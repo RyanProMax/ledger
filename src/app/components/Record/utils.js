@@ -1,9 +1,9 @@
-export const getYearMonthDate = (momentValue) => ({
+import dayjs from 'dayjs';
+
+export const formatDateValue = (momentValue) => ({
   year: momentValue.year(),
-  month: momentValue.month() + 1,
+  month: momentValue.month(),
   date: momentValue.date(),
   day: momentValue.day(),
-  YYYYMMDD: momentValue.format('YYYY-MM-DD')
+  formatDate: momentValue.format('YYYY-MM-DD')
 });
-
-export const a = () => {};

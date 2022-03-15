@@ -1,4 +1,5 @@
 import { Calendar, message } from 'antd';
+import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 import {
@@ -7,48 +8,27 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { ACTION_NAME, OPERATOR } from '../../constant';
 import './index.less';
-import { getYearMonthDate } from './utils';
+import { formatDateValue } from './utils';
 
 const NOWADAY = dayjs();
 
 export default function Record({ setLoading }) {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.record);
-  const [selectedDate, setSelectedDate] = useState({
-    year: NOWADAY.year(),
-    month: NOWADAY.month() + 1,
-    date: NOWADAY.date(),
-    YYYYMMDD: NOWADAY.format('YYYY-MM-DD')
-  });
-  const currYear = useRef(selectedDate.year);
-  const selectedDateDetail = useMemo(() => {
-    if (!data.data) return null;
-    const { month, date, YYYYMMDD } = selectedDate;
-    let ret = get(data, `data[${month}][${date}]`);
-    if (!ret) {
-      ret = {
-        isDate: true,
-        date,
-        income: 0,
-        spending: 0,
-        YYYYMMDD,
-        data: []
-      };
-    }
-    console.log('selectedDateDetail', ret);
-    return ret;
-  }, [data, selectedDate]);
+  const [selectedDate, setSelectedDate] = useState(NOWADAY.format('YYYY-MM-DD'));
+  const selectedDateYear = useMemo(() => formatDateValue(dayjs(selectedDate, 'YYYY-MM-DD')).year, [selectedDate]);
+  const currYear = useRef(selectedDateYear);
 
   // 请求数据
   const fetchRecord = async (force = false) => {
-    if (data.data && !force) return;
+    if (data.year && !force) return;
     setLoading(true);
     try {
       const { status, data: recordData, error } = await window.electron.GET_STORE_DATA(
         'record_${year}.json',
-        `record_${selectedDate.year}.json`,
+        `record_${selectedDateYear}.json`,
         true,
-        { year: selectedDate.year }
+        { year: selectedDateYear }
       );
       console.log('fetchRecord', recordData);
       if (!status) {
@@ -65,34 +45,43 @@ export default function Record({ setLoading }) {
     }
   };
 
-  const handleAdd = () => {
-    console.log('handleAdd');
-  };
-
   // 选择日期
-  const handleSelect = (value) => setSelectedDate(getYearMonthDate(value));
-
-  // 日期变化
-  const handleChange = (value) => {
-    console.log('handleChange', value);
+  const handleSelect = async (value) => {
+    const newSelectDate = value.format('YYYY-MM-DD');
+    setSelectedDate(newSelectDate);
+    const ret = await window.electron.INIT_SUB_WINDOW('detailWindow', 'record_detail', data, newSelectDate);
+    if (ret.code) {
+      message.error(ret.error);
+    }
   };
+
+  const handleAdd = () => handleSelect(dayjs(selectedDate, 'YYYY-MM-DD'));
 
   const dateCellRender = (value) => {
-    const { year, month, date } = getYearMonthDate(value);
-    if (data.year === year) {
-      const ret = get(data, `data[${month}][${date}]`);
-      // console.log('ret', ret);
-      return ret || null;
+    const { date, month, formatDate } = formatDateValue(value);
+    let total = null;
+    if (data[formatDate]) {
+      total = get(data, `statistic[${month}].daily[${formatDate}].total`, null);
     }
-    return null;
+    return (
+      <div style={{ padding: '0 2px' }}>
+        <div className={classnames('ledger-record__date-cell', {
+          'ledger-record__date-cell--negative': total < 0,
+          'ledger-record__date-cell--positive': total !== null && total >= 0
+        })}
+        >
+          <div className="ledger-record__date-cell-date">{date}</div>
+          {total !== null && (<div className="ledger-record__date-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>)}
+        </div>
+      </div>
+    );
   };
 
   const monthCellRender = (value) => {
-    const { year, month } = getYearMonthDate(value);
+    const { year, month } = formatDateValue(value);
     if (data.year === year) {
-      const ret = get(data, `data[${month}]`);
-      // console.log('ret', ret);
-      return ret || null;
+      const ret = get(data, `data[${month - 1}]`);
+      return ret && ret.data.length ? ret.income - ret.spending : null;
     }
     return null;
   };
@@ -117,17 +106,32 @@ export default function Record({ setLoading }) {
   }, []);
 
   useEffect(() => {
-    if (currYear.current !== selectedDate.year) {
+    if (currYear.current !== selectedDateYear) {
       fetchRecord(true);
-      currYear.current = selectedDate.year;
+      currYear.current = selectedDateYear;
     }
-    console.log('handleSelect', selectedDate);
-  }, [selectedDate]);
+  }, [selectedDateYear]);
+
+  useEffect(() => {
+    const cb = ({ type }) => {
+      switch (type) {
+        case 'reload': {
+          fetchRecord(true);
+          break;
+        }
+        default: break;
+      }
+    };
+    // receive message from main process
+    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
+    // cancel subscribe
+    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
+  }, [fetchRecord]);
 
   return (
     <div className="ledger-home-content-component">
       <div className="ledger-record ledger-home-component__general">
-        <Calendar dateCellRender={dateCellRender} monthCellRender={monthCellRender} onSelect={handleSelect} onChange={handleChange} />
+        <Calendar dateFullCellRender={dateCellRender} monthCellRender={monthCellRender} onSelect={handleSelect} />
       </div>
     </div>
   );

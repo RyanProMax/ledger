@@ -9,7 +9,7 @@ const packageJson = isDev ? require('../../package.json') : require('../package.
  */
 const channelInvoke = () => {
   const ret = {};
-  Object.keys(CHANNEL_NAME).forEach((channel) => {
+  Object.keys(CHANNEL_NAME.PRELOAD).forEach((channel) => {
     ret[channel] = (...args) => ipcRenderer.invoke(channel, ...args);
   });
   return ret;
@@ -17,7 +17,11 @@ const channelInvoke = () => {
 
 contextBridge.exposeInMainWorld('electron', {
   packageJson,
-  ...channelInvoke()
+  ...channelInvoke(),
+  SUBSCRIBE: (channel, listener) => {
+    ipcRenderer.on(channel, (event, ...args) => listener(...args));
+  },
+  UNSUBSCRIBE: (channel, listener) => ipcRenderer.removeListener(channel, listener)
 });
 
 contextBridge.exposeInMainWorld('nodeFunction', {

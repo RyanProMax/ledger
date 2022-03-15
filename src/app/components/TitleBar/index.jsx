@@ -6,9 +6,9 @@ import { useSelector } from 'react-redux';
 import Icon from '../Icon';
 
 export default function TitleBar() {
-  const handleMinimize = () => window.electron.MINIMIZE();
-  const handleMaximize = () => window.electron.MAXIMIZE();
-  const handleClose = () => window.electron.CLOSE();
+  const handleMinimize = () => window.electron.MINIMIZE('mainWindow');
+  const handleMaximize = () => window.electron.MAXIMIZE('mainWindow');
+  const handleClose = () => window.electron.CLOSE('mainWindow');
 
   const activeOperator = useSelector((state) => state.operator);
 
