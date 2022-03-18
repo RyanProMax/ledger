@@ -17,7 +17,7 @@ export default function Record({ setLoading }) {
   const data = useSelector((state) => state.record);
   const [selectedDate, setSelectedDate] = useState(NOWADAY.format('YYYY-MM-DD'));
   const selectedDateYear = useMemo(() => formatDateValue(dayjs(selectedDate, 'YYYY-MM-DD')).year, [selectedDate]);
-  const currYear = useRef(selectedDateYear);
+  const prevSelectedYear = useRef(selectedDateYear);
 
   // 请求数据
   const fetchRecord = async (force = false) => {
@@ -60,7 +60,7 @@ export default function Record({ setLoading }) {
   const dateCellRender = (value) => {
     const { date, month, formatDate } = formatDateValue(value);
     let total = null;
-    if (data[formatDate]) {
+    if (data.data && data.data[formatDate]) {
       total = get(data, `statistic[${month}].daily[${formatDate}].total`, null);
     }
     return (
@@ -106,9 +106,9 @@ export default function Record({ setLoading }) {
   }, []);
 
   useEffect(() => {
-    if (currYear.current !== selectedDateYear) {
+    if (prevSelectedYear.current !== selectedDateYear) {
       fetchRecord(true);
-      currYear.current = selectedDateYear;
+      prevSelectedYear.current = selectedDateYear;
     }
   }, [selectedDateYear]);
 

@@ -7,7 +7,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 import moment from 'moment';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, get } from 'lodash-es';
 import SubWindow from '../SubWindow';
 import STORE from '../../../global/Store.json';
 import './index.less';
@@ -39,7 +39,7 @@ export default function RecordDetail() {
   const [tempData, setTempData] = useState([]);
   const [currDate, setCurrDate] = useState('');
 
-  const list = useMemo(() => (data[currDate] || null), [data, currDate]);
+  const list = useMemo(() => get(data, `data[${currDate}]`, null), [data, currDate]);
   const incomeClassData = useMemo(() => classData.filter((c) => c.type === 0), [classData]);
   const spendingClassData = useMemo(() => classData.filter((c) => c.type === 1), [classData]);
   const getRowClass = (type) => (type === 0 ? incomeClassData : spendingClassData);
@@ -138,6 +138,7 @@ export default function RecordDetail() {
   useEffect(() => {
     const cb = (newData, date) => {
       setData(newData);
+      console.log('newData', newData, date);
       setCurrDate(date);
     };
     // receive message from main process
@@ -158,6 +159,9 @@ export default function RecordDetail() {
           )}
           {editing && (
             <>
+              <Icon className={innerClassName} onClick={handleAdd}>
+                <PlusOutlined />
+              </Icon>
               <Icon className={innerClassName} onClick={handleSubmit}>
                 <SaveOutlined />
               </Icon>
@@ -185,8 +189,7 @@ export default function RecordDetail() {
             )
           }
           {editing && (
-            <>
-              <Row gutter={[16, 16]} style={{ width: '100%' }}>
+            <Row gutter={[16, 16]} style={{ width: '100%' }}>
                 {tempData.map((row, index) => {
                   const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
                   const classValue = [row.className];
@@ -288,12 +291,7 @@ export default function RecordDetail() {
                     </Col>
                   );
                 })}
-              </Row>
-
-              <Button type="dashed" block className="ledger-record-detail__add" onClick={handleAdd}>
-                添加
-              </Button>
-            </>
+            </Row>
           )}
         </div>
       </Spin>

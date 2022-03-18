@@ -15,6 +15,7 @@ class Record {
       spending: 0,
       daily: {}
     }));
+    this.data = {};
   }
 }
 

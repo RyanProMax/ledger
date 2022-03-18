@@ -5,10 +5,10 @@ export const mergeData = (list, data) => {
   const toCalculateDate = new Set();
   const ret = cloneDeep(data);
   list.forEach((row) => {
-    if (!ret[row.formatDate]) {
-      ret[row.formatDate] = [];
+    if (!ret.data[row.formatDate]) {
+      ret.data[row.formatDate] = [];
     }
-    const dateList = ret[row.formatDate];
+    const dateList = ret.data[row.formatDate];
     const rowIndex = dateList.findIndex((c) => c.id === row.id);
     if (rowIndex === -1) {
       dateList.push(row);
@@ -20,7 +20,7 @@ export const mergeData = (list, data) => {
   // statistic
   toCalculateDate.forEach((date) => {
     const monthOfDate = dayjs(date, 'YYYY-MM-DD').month();
-    const dateList = ret[date];
+    const dateList = ret.data[date];
     const dateIncome = dateList.filter((d) => d.type === 0).reduce((t, c) => t + c.value, 0);
     const dateSpending = dateList.filter((d) => d.type === 1).reduce((t, c) => t + c.value, 0);
     const currMonth = ret.statistic[monthOfDate];
