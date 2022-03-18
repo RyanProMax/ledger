@@ -17,15 +17,13 @@ import { mergeData } from './utils';
 const { TextArea } = Input;
 const { Option } = Select;
 const template = ({
-  formatDate, classId, className, subClassId, subClassName, walletId, walletName
+  formatDate, className, subClassName, walletId, walletName
 } = {}) => ({
   id: v4(),
   formatDate,
   value: 0,
   type: 1,
-  classId: classId || '',
   className: className || '',
-  subClassId: subClassId || '',
   subClassName: subClassName || '',
   walletId: walletId || '',
   walletName: walletName || '',
@@ -77,18 +75,14 @@ export default function RecordDetail() {
 
   const handleAdd = () => {
     const defaultClass = spendingClassData[0] || {};
-    let subClassId = '';
     let subClassName = '';
     if (defaultClass.children && defaultClass.children.length) {
-      subClassId = defaultClass.children[0].id;
       subClassName = defaultClass.children[0].name;
     }
     const defaultWallet = walletData[0] || {};
     setTempData((oldData) => [...oldData, template({
       formatDate: currDate,
-      classId: defaultClass.id,
       className: defaultClass.name,
-      subClassId,
       subClassName,
       walletId: defaultWallet.id,
       walletName: defaultWallet.name
@@ -195,24 +189,22 @@ export default function RecordDetail() {
               <Row gutter={[16, 16]} style={{ width: '100%' }}>
                 {tempData.map((row, index) => {
                   const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
-                  const classValue = [row.classId];
-                  if (row.subClassId) classValue.push(row.subClassId);
+                  const classValue = [row.className];
+                  if (row.subClassName) classValue.push(row.subClassName);
 
                   const handelChangeType = (e) => {
                     const type = e.target.value;
                     const defaultClass = getRowClass(type)[0] || {};
-                    let subClassId = '';
                     let subClassName = '';
                     let { value } = row;
                     if (defaultClass.children && defaultClass.children.length) {
-                      subClassId = defaultClass.children[0].id;
                       subClassName = defaultClass.children[0].name;
                     }
                     if ((type === 0 && value < 0) || (type === 1 && value > 0)) {
                       value = -value;
                     }
                     handleChange(index, {
-                      type, classId: defaultClass.id || '', className: defaultClass.name || '', subClassId, subClassName, value
+                      type, className: defaultClass.name || '', subClassName, value
                     });
                   };
 
@@ -237,19 +229,12 @@ export default function RecordDetail() {
                             options={getRowClass(row.type)}
                             fieldNames={{
                               label: 'name',
-                              value: 'id'
+                              value: 'name'
                             }}
                             onChange={(val) => {
-                              const [id, subId] = val;
-                              let subClassName = '';
-                              const targetClass = getRowClass(row.type).find((r) => r.id === id);
-                              if (subId && targetClass.children.length) {
-                                subClassName = targetClass.children.find((c) => c.id === subId).name;
-                              }
+                              const [className, subClassName] = val;
                               handleChange(index, {
-                                classId: id,
-                                className: targetClass.name,
-                                subClassId: subId || '',
+                                className,
                                 subClassName
                               });
                             }}
