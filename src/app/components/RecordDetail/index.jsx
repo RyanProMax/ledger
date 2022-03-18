@@ -1,8 +1,8 @@
 import {
-  CloseCircleOutlined, CloseOutlined, EditOutlined, PlusOutlined, SaveOutlined
+  CloseOutlined, EditOutlined, PlusOutlined, SaveOutlined
 } from '@ant-design/icons';
 import {
-  Button, Cascader, Col, DatePicker, Empty, Input, InputNumber, message, Radio, Row, Select, Spin
+  Button, Col, Empty, message, Row, Spin
 } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
@@ -13,9 +13,8 @@ import STORE from '../../../global/Store.json';
 import './index.less';
 import Icon from '../Icon';
 import { mergeData } from './utils';
+import EditCard from './EditCard';
 
-const { TextArea } = Input;
-const { Option } = Select;
 const template = ({
   formatDate, className, subClassName, walletId, walletName
 } = {}) => ({
@@ -31,7 +30,7 @@ const template = ({
 });
 
 export default function RecordDetail() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState([]);
   const [walletData, setWalletData] = useState([]);
   const [editing, setEditing] = useState(false);
@@ -39,7 +38,7 @@ export default function RecordDetail() {
   const [tempData, setTempData] = useState([]);
   const [currDate, setCurrDate] = useState('');
 
-  const list = useMemo(() => get(data, `data[${currDate}]`, null), [data, currDate]);
+  const list = useMemo(() => get(data, `data[${currDate}]`, []), [data, currDate]);
   const incomeClassData = useMemo(() => classData.filter((c) => c.type === 0), [classData]);
   const spendingClassData = useMemo(() => classData.filter((c) => c.type === 1), [classData]);
   const getRowClass = (type) => (type === 0 ? incomeClassData : spendingClassData);
@@ -63,7 +62,7 @@ export default function RecordDetail() {
 
   const handleEdit = () => {
     setEditing(true);
-    if (list && list.length) {
+    if (list.length) {
       setTempData(cloneDeep(list));
     }
   };
@@ -89,7 +88,7 @@ export default function RecordDetail() {
     })]);
   };
 
-  const handleChange = (index, newKeyValues) => {
+  const handleChange = (index) => (newKeyValues) => {
     setTempData((oldData) => {
       const newData = [...oldData];
       newData[index] = { ...newData[index], ...newKeyValues };
@@ -97,7 +96,7 @@ export default function RecordDetail() {
     });
   };
 
-  const handleRemove = (index) => {
+  const handleRemove = (index) => () => {
     setTempData((oldData) => {
       const newData = [...oldData];
       newData.splice(index, 1);
@@ -129,7 +128,7 @@ export default function RecordDetail() {
         fetchData(STORE.CLASSIFICATION.FILE_NAME, STORE.CLASSIFICATION.FILE_NAME, setClassData),
         fetchData(STORE.WALLET.FILE_NAME, STORE.WALLET.FILE_NAME, setWalletData)
       ]);
-      if (results.every((r) => r)) {
+      if (results.every((r) => r) && data.year) {
         setLoading(false);
       }
     })();
@@ -140,12 +139,65 @@ export default function RecordDetail() {
       setData(newData);
       console.log('newData', newData, date);
       setCurrDate(date);
+      setLoading(false);
     };
     // receive message from main process
     window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
     // cancel subscribe
     return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
   }, [setData]);
+
+  // 编辑页
+  const renderEditPage = () => {
+    if (!editing) return null;
+    return (
+      <Row gutter={[16, 16]} style={{ width: '100%' }}>
+        {tempData.map((row, index) => {
+          const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
+          const classValue = [row.className];
+          if (row.subClassName) classValue.push(row.subClassName);
+
+          const indexHandleChange = handleChange(index);
+          const indexHandleRemove = handleRemove(index);
+
+          const handelChangeType = (e) => {
+            const type = e.target.value;
+            const defaultClass = getRowClass(type)[0] || {};
+            let subClassName = '';
+            let { value } = row;
+            if (defaultClass.children && defaultClass.children.length) {
+              subClassName = defaultClass.children[0].name;
+            }
+            if ((type === 0 && value < 0) || (type === 1 && value > 0)) {
+              value = -value;
+            }
+            indexHandleChange({
+              type, className: defaultClass.name || '', subClassName, value
+            });
+          };
+
+          return (
+            <Col xs={{ span: 24 }} md={{ span: 12 }} lg={{ span: 8 }} xl={{ span: 6 }} key={row.id}>
+              <EditCard
+                defaultDateValue={defaultDateValue}
+                type={row.type}
+                classValue={classValue}
+                classOptions={getRowClass(row.type)}
+                value={row.value}
+                walletId={row.walletId}
+                walletName={row.walletName}
+                walletOptions={walletData}
+                remark={row.remark}
+                handleChange={indexHandleChange}
+                handleRemove={indexHandleRemove}
+                handelChangeType={handelChangeType}
+              />
+            </Col>
+          );
+        })}
+      </Row>
+    );
+  };
 
   return (
     <SubWindow
@@ -176,7 +228,7 @@ export default function RecordDetail() {
       <Spin spinning={loading}>
         <div className="ledger-record-detail">
           {
-            !editing && (!list || !list.length) && (
+            !editing && !list.length && (
               <Empty style={{ marginTop: 60 }}>
                 <Button
                   icon={<PlusOutlined />}
@@ -188,111 +240,7 @@ export default function RecordDetail() {
               </Empty>
             )
           }
-          {editing && (
-            <Row gutter={[16, 16]} style={{ width: '100%' }}>
-                {tempData.map((row, index) => {
-                  const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
-                  const classValue = [row.className];
-                  if (row.subClassName) classValue.push(row.subClassName);
-
-                  const handelChangeType = (e) => {
-                    const type = e.target.value;
-                    const defaultClass = getRowClass(type)[0] || {};
-                    let subClassName = '';
-                    let { value } = row;
-                    if (defaultClass.children && defaultClass.children.length) {
-                      subClassName = defaultClass.children[0].name;
-                    }
-                    if ((type === 0 && value < 0) || (type === 1 && value > 0)) {
-                      value = -value;
-                    }
-                    handleChange(index, {
-                      type, className: defaultClass.name || '', subClassName, value
-                    });
-                  };
-
-                  return (
-                    <Col xs={{ span: 24 }} md={{ span: 12 }} lg={{ span: 8 }} xl={{ span: 6 }} key={row.id}>
-                      <div className="ledger-record-detail__card">
-                        <div className="ledger-record-detail__card-form">
-                          <span className="ledger-record-detail__card-label">日期</span>
-                          <DatePicker defaultValue={defaultDateValue} size="small" format="YYYY-MM-DD" onChange={(momentValue) => handleChange(index, { formatDate: momentValue.format('YYYY-MM-DD') })} />
-                          <span className="ledger-record-detail__card-label">收支类型</span>
-                          <Radio.Group
-                            value={row.type}
-                            size="small"
-                            onChange={handelChangeType}
-                          >
-                            <Radio value={0}>收入</Radio>
-                            <Radio value={1}>支出</Radio>
-                          </Radio.Group>
-                          <span className="ledger-record-detail__card-label">分类</span>
-                          <Cascader
-                            value={classValue}
-                            options={getRowClass(row.type)}
-                            fieldNames={{
-                              label: 'name',
-                              value: 'name'
-                            }}
-                            onChange={(val) => {
-                              const [className, subClassName] = val;
-                              handleChange(index, {
-                                className,
-                                subClassName
-                              });
-                            }}
-                            size="small"
-                            style={{ width: '100%' }}
-                          />
-                          <span className="ledger-record-detail__card-label">金额</span>
-                          <InputNumber
-                            value={row.value}
-                            precision={2}
-                            controls={false}
-                            onChange={(val) => {
-                              if ((row.type === 0 && val < 0) || (row.type === 1 && val > 0)) {
-                                handleChange(index, { value: -val });
-                              } else {
-                                handleChange(index, { value: val });
-                              }
-                            }}
-                            size="small"
-                            style={{ width: '100%' }}
-                          />
-                          <span className="ledger-record-detail__card-label">
-                            {row.type === 0 ? '收入' : '支出'}
-                            账号
-                          </span>
-                          <Select
-                            labelInValue
-                            size="small"
-                            value={{ value: row.walletId, label: row.walletName }}
-                            onChange={(val) => {
-                              handleChange(index, {
-                                walletId: val.value,
-                                walletName: val.label
-                              });
-                            }}
-                          >
-                            {walletData.map((c) => (
-                              <Option key={c.id} value={c.id}>{c.name}</Option>
-                            ))}
-                          </Select>
-                          <span className="ledger-record-detail__card-label">备注</span>
-                          <TextArea
-                            value={row.remark}
-                            placeholder="备注"
-                            maxLength={100}
-                            onChange={(e) => handleChange(index, { remark: e.target.value })}
-                          />
-                        </div>
-                        <CloseCircleOutlined className="ledger-record-detail__card-remove" onClick={() => handleRemove(index)} />
-                      </div>
-                    </Col>
-                  );
-                })}
-            </Row>
-          )}
+          {renderEditPage()}
         </div>
       </Spin>
     </SubWindow>
