@@ -33,16 +33,16 @@ export default function SubWindow({
         {renderOperation('ledger-sub-window-menu__icon')}
         <div className="ledger-sub-window-menu__operator">
           { minimize && (
-          <Icon className="ledger-sub-window-menu__icon" onClick={handleMinimize}>
+          <Icon tipText="最小化" tipPlacement="left" className="ledger-sub-window-menu__icon" onClick={handleMinimize}>
             <MinusOutlined />
           </Icon>
           ) }
           { maximize && (
-          <Icon className="ledger-sub-window-menu__icon" onClick={handleMaximize}>
+          <Icon tipText={isMaximize ? '恢复' : '最大化'} tipPlacement="left" className="ledger-sub-window-menu__icon" onClick={handleMaximize}>
             {isMaximize ? <ReactSVG src={IconRestore} className="ledger-svg" /> : <BorderOutlined /> }
           </Icon>
           ) }
-          <Icon className="ledger-sub-window-menu__icon" onClick={handleClose}>
+          <Icon tipText="关闭" tipPlacement="left" className="ledger-sub-window-menu__icon" onClick={handleClose}>
             <CloseOutlined />
           </Icon>
         </div>

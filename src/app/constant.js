@@ -1,5 +1,5 @@
 import {
-  PlusOutlined, EditOutlined, CheckOutlined, CloseOutlined
+  PlusOutlined, EditOutlined, CloseOutlined, SaveOutlined
 } from '@ant-design/icons';
 
 export const ACTION_NAME = {
@@ -12,18 +12,22 @@ export const ACTION_NAME = {
 export const OPERATOR = {
   ADD: {
     id: 'ADD',
-    icon: PlusOutlined
+    icon: PlusOutlined,
+    tipText: '添加'
   },
   EDIT: {
     id: 'EDIT',
-    icon: EditOutlined
+    icon: EditOutlined,
+    tipText: '编辑'
   },
   FINISH: {
     id: 'FINISH',
-    icon: CheckOutlined
+    icon: SaveOutlined,
+    tipText: '保存'
   },
   CANCEL: {
     id: 'CANCEL',
-    icon: CloseOutlined
+    icon: CloseOutlined,
+    tipText: '取消'
   }
 };

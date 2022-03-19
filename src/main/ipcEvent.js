@@ -86,6 +86,14 @@ const registerMainIPCEvent = () => {
       return false;
     }
   });
+
+  // dev-tools
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.OPEN_DEV_TOOLS, (event, windowName) => {
+    const targetWindow = appInfo.windowStore.get(windowName);
+    if (targetWindow) {
+      targetWindow.webContents.openDevTools();
+    }
+  });
 };
 
 module.exports = {

@@ -32,20 +32,20 @@ export default function TitleBar() {
     <div className="ledger-title-bar">
       <div className="ledger-title-bar__main">
         {activeOperator.map((v) => (
-          <Icon key={v.id} onClick={v.clickEvent} className="ledger-title-bar__operator-icon">
+          <Icon tipText={v.tipText} key={v.id} onClick={v.clickEvent} className="ledger-title-bar__operator-icon">
             <v.icon />
           </Icon>
         ))}
 
       </div>
       <div className="ledger-title-bar__operator">
-        <Icon className="ledger-title-bar__operator-icon" onClick={handleMinimize}>
+        <Icon tipText="最小化" tipPlacement="left" className="ledger-title-bar__operator-icon" onClick={handleMinimize}>
           <MinusOutlined />
         </Icon>
-        <Icon className="ledger-title-bar__operator-icon" onClick={handleMaximize}>
+        <Icon tipText={isMaximize ? '还原' : '最大化'} tipPlacement="left" className="ledger-title-bar__operator-icon" onClick={handleMaximize}>
           {isMaximize ? <ReactSVG src={IconRestore} className="ledger-svg" /> : <BorderOutlined /> }
         </Icon>
-        <Icon className="ledger-title-bar__operator-icon" onClick={handleClose}>
+        <Icon tipText="关闭" tipPlacement="left" className="ledger-title-bar__operator-icon" onClick={handleClose}>
           <CloseOutlined />
         </Icon>
       </div>

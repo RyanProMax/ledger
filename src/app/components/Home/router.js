@@ -7,8 +7,16 @@ import Classification from '../Classification';
 import Wallet from '../Wallet';
 
 export default [
-  { path: '/', component: Dashboard, icon: BarChartOutlined },
-  { path: '/record', component: Record, icon: AccountBookOutlined },
-  { path: '/classification', component: Classification, icon: TagsOutlined },
-  { path: '/wallet', component: Wallet, icon: CreditCardOutlined }
+  {
+    path: '/', component: Dashboard, icon: BarChartOutlined, tipText: '总览'
+  },
+  {
+    path: '/record', component: Record, icon: AccountBookOutlined, tipText: '详情'
+  },
+  {
+    path: '/classification', component: Classification, icon: TagsOutlined, tipText: '分类'
+  },
+  {
+    path: '/wallet', component: Wallet, icon: CreditCardOutlined, tipText: '账户'
+  }
 ];

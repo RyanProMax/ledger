@@ -159,19 +159,19 @@ export default function RecordDetail() {
   const rednerTopOperation = (innerClassName) => (
     <>
       {!editing && (
-      <Icon className={innerClassName} onClick={handleEdit}>
+      <Icon tipText="编辑" className={innerClassName} onClick={handleEdit}>
         <EditOutlined />
       </Icon>
       )}
       {editing && (
       <>
-        <Icon className={innerClassName} onClick={handleAdd}>
+        <Icon tipText="添加" className={innerClassName} onClick={handleAdd}>
           <PlusOutlined />
         </Icon>
-        <Icon className={innerClassName} onClick={handleSubmit}>
+        <Icon tipText="保存" className={innerClassName} onClick={handleSubmit}>
           <SaveOutlined />
         </Icon>
-        <Icon className={innerClassName} onClick={handleCancel}>
+        <Icon tipText="取消" className={innerClassName} onClick={handleCancel}>
           <CloseOutlined />
         </Icon>
       </>
