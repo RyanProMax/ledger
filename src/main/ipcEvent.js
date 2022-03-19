@@ -30,7 +30,9 @@ const registerMainIPCEvent = () => {
   ipcMain.handle(CHANNEL_NAME.PRELOAD.SET_STORE_DATA, (event, ...args) => setStoreData(...args));
 
   // create sub-window
-  ipcMain.handle(CHANNEL_NAME.PRELOAD.INIT_SUB_WINDOW, async (events, windowName, windowPage, ...args) => {
+  ipcMain.handle(CHANNEL_NAME.PRELOAD.INIT_SUB_WINDOW, async (events, {
+    windowName, windowPage, windowConfig, message
+  }) => {
     let subWindow = appInfo.windowStore.get(windowName);
     if (!subWindow) {
       subWindow = new BrowserWindow({
@@ -39,24 +41,25 @@ const registerMainIPCEvent = () => {
         minWidth: 600,
         minHeight: 450,
         frame: false,
-        webPreferences: { preload: path.join(__dirname, 'preload.js') }
+        webPreferences: { preload: path.join(__dirname, 'preload.js') },
+        ...windowConfig
       });
       subWindow.setMenu(null);
       subWindow.loadURL(parsePageUrl(windowPage));
       subWindow.webContents.openDevTools();
       appInfo.windowStore.set(windowName, subWindow);
       // 如果创建窗口时携带参数一并发送，节省一次IPC通信
-      if (args && args.length) {
+      if (message) {
         subWindow.webContents.on('did-finish-load', () => {
-          subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, ...args);
+          subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, message);
         });
       }
     } else {
       if (!subWindow.isVisible()) {
         subWindow.show();
       }
-      if (args && args.length) {
-        subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, ...args);
+      if (message) {
+        subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, message);
       }
     }
     return true;

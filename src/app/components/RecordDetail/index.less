@@ -1,5 +1,15 @@
 @import '../../styles/theme.less';
 
+.main_box {
+  width: 100%;
+  padding: 16px;
+  border-radius: 6px;
+  box-shadow: @box-shadow-light;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+}
+
 .ledger-record-detail {
   display: flex;
   align-items: center;
@@ -12,13 +22,7 @@
   background-color: #f8f8f8;
 
   &__card {
-    width: 100%;
-    padding: 16px;
-    border-radius: 6px;
-    box-shadow: @box-shadow-light;
-    background-color: #fff;
-    display: flex;
-    align-items: center;
+    .main_box();
 
     &-remove{
       cursor: pointer;
@@ -69,5 +73,73 @@
       color: #f5222d !important;
       border-color: #ff7875 !important;
     }
+  }
+
+  &__main {
+    .main_box();
+    padding: 20px;
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+  }
+  
+  &__date {
+    color: #606266;
+    display: flex;
+    align-items: flex-end;
+
+    &--number {
+      font-size: 36px;
+      font-weight: 100;
+      font-family: monospace;
+      color: #333;
+    }
+
+    &--word {
+      margin: 0 10px;
+      padding-bottom: 3px;
+      font-size: 18px;
+      font-family: serif;
+      font-weight: 100;
+    }
+  }
+
+  &__total {
+    font-size: 24px;
+    font-weight: 100;
+    font-family: monospace;
+    color: #333;
+
+    &--positive {
+      color: #ff7875;
+    }
+
+    &--negative {
+      color: #7cb305;
+    }
+  }
+
+  &__logo {
+    font-size: 28px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  &__divider {
+    margin-top: 28px !important;
+  }
+
+  &__ticket {
+    margin: 10px;
   }
 }

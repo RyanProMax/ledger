@@ -49,7 +49,15 @@ export default function Record({ setLoading }) {
   const handleSelect = async (value) => {
     const newSelectDate = value.format('YYYY-MM-DD');
     setSelectedDate(newSelectDate);
-    const ret = await window.electron.INIT_SUB_WINDOW('detailWindow', 'record_detail', data, newSelectDate);
+    const ret = await window.electron.INIT_SUB_WINDOW({
+      windowName: 'detailWindow',
+      windowPage: 'record_detail',
+      windowConfig: {
+        width: 720,
+        minWidth: 720
+      },
+      message: { data, date: newSelectDate }
+    });
     if (ret.code) {
       message.error(ret.error);
     }

@@ -1,0 +1,56 @@
+.ledger-divider{
+  width: 100%;
+  min-width: 100%;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  margin: 16px 0;
+  color: #606266;
+  border-color: #dbdbdb;
+
+  &__content {
+    display: inline-block;
+    padding: 0 1em;
+    white-space: nowrap;
+  }
+
+  &::before,
+  &::after{
+    position: relative;
+    content: '';
+    width: 50%;
+    height: 0;
+    border-top-width: 1px;
+    border-style: solid;
+    border-bottom: 0;
+    border-color: inherit;
+    top: 50%;
+    margin-top: -0.5px;
+  }
+
+  &--dashed {
+    &::before,
+    &::after {
+      border-style: dashed;
+    }
+  }
+
+  &--left {
+    &::before {
+      width: 5%;
+    }
+    &::after {
+      width: 95%;
+    }
+  }
+
+  &--right {
+    &::before {
+      width: 95%;
+    }
+    &::after {
+      width: 5%;
+    }
+  }
+}
