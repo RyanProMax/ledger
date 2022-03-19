@@ -18,7 +18,7 @@ export default function TitleBar() {
 
   useEffect(() => {
     const cb = ({ type, isMaximized }) => {
-      if (type === 'resize') {
+      if (type === 'maximize') {
         setIsMaximize(isMaximized);
       }
     };

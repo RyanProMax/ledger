@@ -10,8 +10,8 @@ const registerMainIPCEvent = () => {
 
   // main-window-event
   const mainWindow = appInfo.windowStore.get('mainWindow');
-  mainWindow.on('maximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true }));
-  mainWindow.on('unmaximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false }));
+  mainWindow.on('maximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'maximize', isMaximized: true }));
+  mainWindow.on('unmaximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'maximize', isMaximized: false }));
   mainWindow.on('close', () => app.quit());
 
   // main-process-event

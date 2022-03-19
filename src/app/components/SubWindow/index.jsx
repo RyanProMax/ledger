@@ -17,7 +17,7 @@ export default function SubWindow({
 
   useEffect(() => {
     const cb = ({ type, isMaximized }) => {
-      if (type === 'resize') {
+      if (type === 'maximize') {
         setIsMaximize(isMaximized);
       }
     };

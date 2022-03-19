@@ -25,6 +25,7 @@
     "babel-eslint": "^10.1.0",
     "classnames": "^2.3.1",
     "cross-env": "^7.0.3",
+    "echarts": "^5.3.1",
     "electron": "^17.1.0",
     "electron-builder": "^22.14.13",
     "eslint": "^8.10.0",
