@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 import {
+  useCallback,
   useEffect, useMemo, useRef, useState
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,6 +17,7 @@ export default function Record({ setLoading }) {
   const dispatch = useDispatch();
   const data = useSelector((state) => state.record);
   const [selectedDate, setSelectedDate] = useState(NOWADAY.format('YYYY-MM-DD'));
+  const [mode, setMode] = useState('month');
   const selectedDateYear = useMemo(() => formatDateValue(dayjs(selectedDate, 'YYYY-MM-DD')).year, [selectedDate]);
   const prevSelectedYear = useRef(selectedDateYear);
 
@@ -83,24 +85,40 @@ export default function Record({ setLoading }) {
   };
 
   const monthCellRender = (value) => {
-    const { year, month } = formatDateValue(value);
-    if (data.year === year) {
-      const ret = get(data, `data[${month - 1}]`);
-      return ret && ret.data.length ? ret.income - ret.spending : null;
-    }
-    return null;
+    const { month } = formatDateValue(value);
+    const total = get(data, `statistic[${month}].total`, 0);
+    const hasData = Object.keys(get(data, `statistic[${month}].daily`, {})).length;
+    return (
+      <div>
+        <div className={classnames('ledger-record__month-cell', {
+          'ledger-record__month-cell--negative': hasData && total < 0,
+          'ledger-record__month-cell--positive': hasData && total >= 0
+        })}
+        >
+          <div className="ledger-record__month-cell-month">{month + 1}</div>
+          {hasData ? (<div className="ledger-record__month-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>) : null}
+        </div>
+      </div>
+    );
   };
 
   // 初始化操作项
-  const handleOperator = () => {
-    const operatorData = [
-      { ...OPERATOR.ADD, clickEvent: handleAdd }
-    ];
-    dispatch({
-      type: ACTION_NAME.SET_OPERATOR,
-      data: operatorData
-    });
-  };
+  const handleOperator = useCallback(() => {
+    if (mode === 'month') {
+      const operatorData = [
+        { ...OPERATOR.ADD, clickEvent: handleAdd }
+      ];
+      dispatch({
+        type: ACTION_NAME.SET_OPERATOR,
+        data: operatorData
+      });
+    } else {
+      dispatch({
+        type: ACTION_NAME.SET_OPERATOR,
+        data: []
+      });
+    }
+  }, [mode, handleAdd]);
 
   useEffect(() => {
     handleOperator();
@@ -136,7 +154,7 @@ export default function Record({ setLoading }) {
   return (
     <div className="ledger-home-content-component">
       <div className="ledger-record ledger-home-component__general">
-        <Calendar dateFullCellRender={dateCellRender} monthCellRender={monthCellRender} />
+        <Calendar onPanelChange={(date, newMode) => setMode(newMode)} dateFullCellRender={dateCellRender} monthFullCellRender={monthCellRender} />
       </div>
     </div>
   );
