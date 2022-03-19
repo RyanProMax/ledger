@@ -1,16 +1,31 @@
-import {
-  MinusOutlined, BorderOutlined, CloseOutlined
-} from '@ant-design/icons';
+import { MinusOutlined, BorderOutlined, CloseOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
+import { ReactSVG } from 'react-svg';
 import Icon from '../Icon';
+
+import IconRestore from '../../assets/restore.svg';
 import './index.less';
 
 export default function SubWindow({
   renderOperation = () => null,
   minimize = true, maximize = true, windowName, children, realClose = true
 }) {
+  const [isMaximize, setIsMaximize] = useState(false);
   const handleMinimize = () => window.electron.MINIMIZE(windowName);
   const handleMaximize = () => window.electron.MAXIMIZE(windowName);
   const handleClose = () => (realClose ? window.electron.CLOSE(windowName) : window.electron.HIDE(windowName));
+
+  useEffect(() => {
+    const cb = ({ type, isMaximized }) => {
+      if (type === 'resize') {
+        setIsMaximize(isMaximized);
+      }
+    };
+    // receive message from main process
+    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
+    // cancel subscribe
+    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
+  }, [setIsMaximize]);
 
   return (
     <div className="ledger-sub-window">
@@ -24,7 +39,7 @@ export default function SubWindow({
           ) }
           { maximize && (
           <Icon className="ledger-sub-window-menu__icon" onClick={handleMaximize}>
-            <BorderOutlined />
+            {isMaximize ? <ReactSVG src={IconRestore} className="ledger-svg" /> : <BorderOutlined /> }
           </Icon>
           ) }
           <Icon className="ledger-sub-window-menu__icon" onClick={handleClose}>

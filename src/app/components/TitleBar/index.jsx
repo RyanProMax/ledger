@@ -2,35 +2,51 @@ import './index.less';
 import {
   MinusOutlined, BorderOutlined, CloseOutlined
 } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { ReactSVG } from 'react-svg';
 import Icon from '../Icon';
+import IconRestore from '../../assets/restore.svg';
 
 export default function TitleBar() {
+  const [isMaximize, setIsMaximize] = useState(false);
   const handleMinimize = () => window.electron.MINIMIZE('mainWindow');
   const handleMaximize = () => window.electron.MAXIMIZE('mainWindow');
   const handleClose = () => window.electron.CLOSE('mainWindow');
 
   const activeOperator = useSelector((state) => state.operator);
 
+  useEffect(() => {
+    const cb = ({ type, isMaximized }) => {
+      if (type === 'resize') {
+        setIsMaximize(isMaximized);
+      }
+    };
+    // receive message from main process
+    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
+    // cancel subscribe
+    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
+  }, [setIsMaximize]);
+
   return (
     <div className="ledger-title-bar">
       <div className="ledger-title-bar__main">
         {activeOperator.map((v) => (
-          <Icon key={v.id} onClick={v.clickEvent}>
-            <v.icon className="ledger-title-bar__icon" />
+          <Icon key={v.id} onClick={v.clickEvent} className="ledger-title-bar__operator-icon">
+            <v.icon />
           </Icon>
         ))}
 
       </div>
       <div className="ledger-title-bar__operator">
         <Icon className="ledger-title-bar__operator-icon" onClick={handleMinimize}>
-          <MinusOutlined className="ledger-title-bar__icon" />
+          <MinusOutlined />
         </Icon>
         <Icon className="ledger-title-bar__operator-icon" onClick={handleMaximize}>
-          <BorderOutlined className="ledger-title-bar__icon" />
+          {isMaximize ? <ReactSVG src={IconRestore} className="ledger-svg" /> : <BorderOutlined /> }
         </Icon>
         <Icon className="ledger-title-bar__operator-icon" onClick={handleClose}>
-          <CloseOutlined className="ledger-title-bar__icon" />
+          <CloseOutlined />
         </Icon>
       </div>
     </div>

@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const { parsePageUrl } = require('./utils');
+const { parsePageUrl, isDev } = require('./utils');
 const { registerMainIPCEvent } = require('./ipcEvent');
 const { initStore } = require('./store');
 const { AppInfo, initAppData } = require('./app');
@@ -21,7 +21,9 @@ const initMain = async () => {
   });
   mainWindow.setMenu(null);
   mainWindow.loadURL(parsePageUrl('home'));
-  mainWindow.webContents.openDevTools();
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
   appInfo.windowStore.set('mainWindow', mainWindow);
 
   initAppData();

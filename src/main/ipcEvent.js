@@ -3,7 +3,7 @@ const path = require('path');
 const { AppInfo } = require('./app');
 const { CHANNEL_NAME } = require('./constant');
 const { getStoreData, setStoreData } = require('./store');
-const { parsePageUrl } = require('./utils');
+const { parsePageUrl, isDev } = require('./utils');
 
 const registerMainIPCEvent = () => {
   const appInfo = AppInfo.getInstance();
@@ -14,8 +14,10 @@ const registerMainIPCEvent = () => {
     const targetWindow = appInfo.windowStore.get(windowName);
     if (targetWindow.isMaximized()) {
       targetWindow.restore();
+      targetWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false });
     } else {
       targetWindow.maximize();
+      targetWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true });
     }
   });
   ipcMain.handle(CHANNEL_NAME.PRELOAD.CLOSE, (event, windowName) => {
@@ -46,7 +48,9 @@ const registerMainIPCEvent = () => {
       });
       subWindow.setMenu(null);
       subWindow.loadURL(parsePageUrl(windowPage));
-      subWindow.webContents.openDevTools();
+      if (isDev) {
+        subWindow.webContents.openDevTools();
+      }
       appInfo.windowStore.set(windowName, subWindow);
       // 如果创建窗口时携带参数一并发送，节省一次IPC通信
       if (message) {

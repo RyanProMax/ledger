@@ -56,7 +56,7 @@ export default function Record({ setLoading }) {
         width: 720,
         minWidth: 720
       },
-      message: { data, date: newSelectDate }
+      message: { type: 'data', data, date: newSelectDate }
     });
     if (ret.code) {
       message.error(ret.error);
@@ -67,19 +67,17 @@ export default function Record({ setLoading }) {
 
   const dateCellRender = (value) => {
     const { date, month, formatDate } = formatDateValue(value);
-    let total = null;
-    if (data.data && data.data[formatDate]) {
-      total = get(data, `statistic[${month}].daily[${formatDate}].total`, null);
-    }
+    const dailyData = get(data, `data[${formatDate}]`, []);
+    const total = get(data, `statistic[${month}].daily[${formatDate}].total`, 0);
     return (
       <div style={{ padding: '0 2px' }}>
         <div className={classnames('ledger-record__date-cell', {
-          'ledger-record__date-cell--negative': total < 0,
-          'ledger-record__date-cell--positive': total !== null && total >= 0
+          'ledger-record__date-cell--negative': dailyData.length && total < 0,
+          'ledger-record__date-cell--positive': dailyData.length && total >= 0
         })}
         >
           <div className="ledger-record__date-cell-date">{date}</div>
-          {total !== null && (<div className="ledger-record__date-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>)}
+          {dailyData.length ? (<div className="ledger-record__date-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>) : null}
         </div>
       </div>
     );

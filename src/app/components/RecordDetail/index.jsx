@@ -14,7 +14,7 @@ import SubWindow from '../SubWindow';
 import STORE from '../../../global/Store.json';
 import './index.less';
 import Icon from '../Icon';
-import { mergeData } from './utils';
+import { updateRecordData } from './utils';
 import EditCard from './EditCard';
 import Divider from '../Divider';
 import Ticket from '../Ticket';
@@ -64,13 +64,6 @@ export default function RecordDetail() {
     }
   };
 
-  const handleEdit = () => {
-    setEditing(true);
-    if (dailyList.length) {
-      setTempData(cloneDeep(dailyList));
-    }
-  };
-
   const handleCancel = () => {
     setEditing(false);
     setTempData([]);
@@ -90,6 +83,15 @@ export default function RecordDetail() {
       walletId: defaultWallet.id,
       walletName: defaultWallet.name
     })]);
+  };
+
+  const handleEdit = () => {
+    setEditing(true);
+    if (dailyList.length) {
+      setTempData(cloneDeep(dailyList));
+    } else {
+      handleAdd();
+    }
   };
 
   const handleChange = (index) => (newKeyValues) => {
@@ -114,12 +116,12 @@ export default function RecordDetail() {
       return;
     }
     setLoading(true);
-    const newData = mergeData(tempData, data);
+    const newRecordData = updateRecordData(data, tempData, currDate);
     await window.electron.SET_STORE_DATA({
-      storeFileName: `record_${newData.year}.json`,
-      data: newData
+      storeFileName: `record_${newRecordData.year}.json`,
+      data: newRecordData
     });
-    setData(newData);
+    setData(newRecordData);
     setEditing(false);
     await window.electron.SEND_MESSAGE('mainWindow', { type: 'reload' });
     setLoading(false);
@@ -139,11 +141,13 @@ export default function RecordDetail() {
   }, []);
 
   useEffect(() => {
-    const cb = ({ data: newData, date }) => {
-      setData(newData);
-      console.log('newData', newData, date);
-      setCurrDate(date);
-      setLoading(false);
+    const cb = ({ type, data: newData, date }) => {
+      if (type === 'data') {
+        setData(newData);
+        console.log('newData', newData, date);
+        setCurrDate(date);
+        setLoading(false);
+      }
     };
     // receive message from main process
     window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
@@ -193,8 +197,11 @@ export default function RecordDetail() {
     const dayjsDate = dayjs(currDate, 'YYYY-MM-DD');
     const month = dayjsDate.month() + 1;
     const date = dayjsDate.date();
-    const total = get(data, `statistic[${month - 1}].total`, 0).toFixed(2);
+    const total = get(data, `statistic[${month - 1}].daily[${currDate}].total`, 0).toFixed(2);
     const isPositive = total >= 0;
+    console.log(dailyList);
+    const incomeList = dailyList.filter((x) => x.type === 0);
+    const spendingList = dailyList.filter((x) => x.type === 1);
 
     return (
       <div className="ledger-record-detail__main">
@@ -213,102 +220,118 @@ export default function RecordDetail() {
           >
             ￥
             {' '}
-            {total}
+            {Math.abs(total)}
           </div>
         </div>
-        <Divider dashed orientation="left" className="ledger-record-detail__divider" style={{ color: '#ff4d4f', borderColor: '#ffccc7' }}>
-          <RedEnvelopeOutlined style={{ marginRight: '8px' }} />
-          收入明细
-        </Divider>
-        <Row style={{ width: '100%' }}>
-          {dailyList.filter((r) => r.type === 0).map((r) => {
-            const row = { ...r, classNameText: r.className };
-            delete row.className;
-            return (
-              <Col key={r.id} span={8}>
-                <Ticket
-                  {...row}
-                  color="#ff4d4f"
-                  borderColor="#ffccc7"
-                  dashed
-                  className="ledger-record-detail__ticket"
-                />
-              </Col>
-            );
-          })}
-        </Row>
-        <Divider dashed orientation="left" className="ledger-record-detail__divider" style={{ color: '#52c41a', borderColor: '#b7eb8f' }}>
-          <RedEnvelopeOutlined style={{ marginRight: '8px' }} />
-          支出明细
-        </Divider>
-        <Row style={{ width: '100%' }}>
-          {dailyList.filter((r) => r.type === 1).map((r) => {
-            const row = { ...r, classNameText: r.className };
-            delete row.className;
-            return (
-              <Col key={r.id} span={8}>
-                <Ticket
-                  {...row}
-                  color="#52c41a"
-                  borderColor="#b7eb8f"
-                  dashed
-                  className="ledger-record-detail__ticket"
-                />
-              </Col>
-            );
-          })}
-        </Row>
+        {incomeList.length ? (
+          <>
+            <Divider dashed orientation="left" className="ledger-record-detail__divider" style={{ color: '#ff4d4f', borderColor: '#ffccc7' }}>
+              <RedEnvelopeOutlined style={{ marginRight: '8px' }} />
+              收入明细
+            </Divider>
+            <Row style={{ width: '100%' }}>
+              {dailyList.filter((r) => r.type === 0).map((r) => {
+                const row = { ...r, classNameText: r.className };
+                delete row.className;
+                return (
+                  <Col key={r.id} span={8}>
+                    <Ticket
+                      {...row}
+                      color="#ff4d4f"
+                      borderColor="#ffccc7"
+                      dashed
+                      className="ledger-record-detail__ticket"
+                    />
+                  </Col>
+                );
+              })}
+            </Row>
+          </>
+        ) : null}
+        {spendingList.length ? (
+          <>
+            <Divider dashed orientation="left" className="ledger-record-detail__divider" style={{ color: '#52c41a', borderColor: '#b7eb8f' }}>
+              <RedEnvelopeOutlined style={{ marginRight: '8px' }} />
+              支出明细
+            </Divider>
+            <Row style={{ width: '100%' }}>
+              {dailyList.filter((r) => r.type === 1).map((r) => {
+                const row = { ...r, classNameText: r.className };
+                delete row.className;
+                return (
+                  <Col key={r.id} span={8}>
+                    <Ticket
+                      {...row}
+                      color="#52c41a"
+                      borderColor="#b7eb8f"
+                      dashed
+                      className="ledger-record-detail__ticket"
+                    />
+                  </Col>
+                );
+              })}
+            </Row>
+          </>
+        ) : null}
       </div>
     );
   };
 
   // 编辑页
   const renderEditPage = () => (
-    <Row gutter={[16, 16]} style={{ width: '100%' }}>
-      {tempData.map((row, index) => {
-        const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
-        const classValue = [row.className];
-        if (row.subClassName) classValue.push(row.subClassName);
+    <div className="ledger-record-detail__edit">
+      <div className="ledger-record-detail__tips">
+        <span>注意：</span>
+        <span>{`1. 当前设置页日期为：【${currDate}】`}</span>
+        <span>2. 如设置其它日期，该笔记录将被【新增】至对应日期的记录下</span>
+        <span>3. 如需切换当前设置页日期，请返回主窗口重新选择</span>
+      </div>
+      <Row gutter={[16, 16]} style={{ width: '100%' }}>
+        {tempData.map((row, index) => {
+          const defaultDateValue = moment(row.formatDate, 'YYYY-MM-DD');
+          const classValue = [row.className];
+          if (row.subClassName) classValue.push(row.subClassName);
 
-        const indexHandleChange = handleChange(index);
-        const indexHandleRemove = handleRemove(index);
+          const indexHandleChange = handleChange(index);
+          const indexHandleRemove = handleRemove(index);
 
-        const handelChangeType = (e) => {
-          const type = e.target.value;
-          const defaultClass = getRowClass(type)[0] || {};
-          let subClassName = '';
-          let { value } = row;
-          if (defaultClass.children && defaultClass.children.length) {
-            subClassName = defaultClass.children[0].name;
-          }
-          if ((type === 0 && value < 0) || (type === 1 && value > 0)) {
-            value = -value;
-          }
-          indexHandleChange({
-            type, className: defaultClass.name || '', subClassName, value
-          });
-        };
+          const handelChangeType = (e) => {
+            const type = e.target.value;
+            const defaultClass = getRowClass(type)[0] || {};
+            let subClassName = '';
+            let { value } = row;
+            if (defaultClass.children && defaultClass.children.length) {
+              subClassName = defaultClass.children[0].name;
+            }
+            if ((type === 0 && value < 0) || (type === 1 && value > 0)) {
+              value = -value;
+            }
+            indexHandleChange({
+              type, className: defaultClass.name || '', subClassName, value
+            });
+          };
 
-        return (
-          <Col xs={{ span: 24 }} md={{ span: 12 }} lg={{ span: 8 }} xl={{ span: 6 }} key={row.id}>
-            <EditCard
-              defaultDateValue={defaultDateValue}
-              type={row.type}
-              classValue={classValue}
-              classOptions={getRowClass(row.type)}
-              value={row.value}
-              walletId={row.walletId}
-              walletName={row.walletName}
-              walletOptions={walletData}
-              remark={row.remark}
-              handleChange={indexHandleChange}
-              handleRemove={indexHandleRemove}
-              handelChangeType={handelChangeType}
-            />
-          </Col>
-        );
-      })}
-    </Row>
+          return (
+            <Col xs={{ span: 24 }} sm={{ span: 12 }} lg={{ span: 8 }} xl={{ span: 6 }} key={row.id}>
+              <EditCard
+                defaultDateValue={defaultDateValue}
+                type={row.type}
+                classValue={classValue}
+                classOptions={getRowClass(row.type)}
+                value={row.value}
+                walletId={row.walletId}
+                walletName={row.walletName}
+                walletOptions={walletData}
+                remark={row.remark}
+                handleChange={indexHandleChange}
+                handleRemove={indexHandleRemove}
+                handelChangeType={handelChangeType}
+              />
+            </Col>
+          );
+        })}
+      </Row>
+    </div>
   );
 
   // 渲染控制
