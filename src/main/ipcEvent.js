@@ -7,6 +7,9 @@ const { parsePageUrl, isDev } = require('./utils');
 
 const registerMainIPCEvent = () => {
   const appInfo = AppInfo.getInstance();
+  const mainWindow = appInfo.windowStore.get('mainWindow');
+  mainWindow.on('maximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true }));
+  mainWindow.on('unmaximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false }));
 
   // window-event
   ipcMain.handle(CHANNEL_NAME.PRELOAD.MINIMIZE, (event, windowName) => appInfo.windowStore.get(windowName).minimize());
@@ -14,7 +17,6 @@ const registerMainIPCEvent = () => {
     const targetWindow = appInfo.windowStore.get(windowName);
     if (targetWindow.isMaximized()) {
       targetWindow.restore();
-      targetWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false });
     } else {
       targetWindow.maximize();
       targetWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true });
@@ -52,6 +54,8 @@ const registerMainIPCEvent = () => {
         subWindow.webContents.openDevTools();
       }
       appInfo.windowStore.set(windowName, subWindow);
+      subWindow.on('maximize', () => subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true }));
+      subWindow.on('unmaximize', () => subWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false }));
       // 如果创建窗口时携带参数一并发送，节省一次IPC通信
       if (message) {
         subWindow.webContents.on('did-finish-load', () => {
