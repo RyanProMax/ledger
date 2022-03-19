@@ -46,8 +46,7 @@ export default function Record({ setLoading }) {
   };
 
   // 选择日期
-  const handleSelect = async (value) => {
-    const newSelectDate = value.format('YYYY-MM-DD');
+  const handleSelect = async (newSelectDate) => {
     setSelectedDate(newSelectDate);
     const ret = await window.electron.INIT_SUB_WINDOW({
       windowName: 'detailWindow',
@@ -70,7 +69,7 @@ export default function Record({ setLoading }) {
     const dailyData = get(data, `data[${formatDate}]`, []);
     const total = get(data, `statistic[${month}].daily[${formatDate}].total`, 0);
     return (
-      <div style={{ padding: '0 2px' }}>
+      <div onClick={() => handleSelect(formatDate)}>
         <div className={classnames('ledger-record__date-cell', {
           'ledger-record__date-cell--negative': dailyData.length && total < 0,
           'ledger-record__date-cell--positive': dailyData.length && total >= 0
@@ -137,7 +136,7 @@ export default function Record({ setLoading }) {
   return (
     <div className="ledger-home-content-component">
       <div className="ledger-record ledger-home-component__general">
-        <Calendar dateFullCellRender={dateCellRender} monthCellRender={monthCellRender} onSelect={handleSelect} />
+        <Calendar dateFullCellRender={dateCellRender} monthCellRender={monthCellRender} />
       </div>
     </div>
   );
