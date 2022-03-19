@@ -11,7 +11,8 @@ export default defineConfig({
     outDir: 'build/app.content',
     rollupOptions: {
       input: {
-        home: resolve(__dirname, 'src/app/pages/home/index.html')
+        home: resolve(__dirname, 'src/app/pages/home/index.html'),
+        record_detail: resolve(__dirname, 'src/app/pages/record_detail/index.html')
       },
       external: ['electron']
     }

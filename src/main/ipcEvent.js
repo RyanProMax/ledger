@@ -1,4 +1,4 @@
-const { ipcMain, BrowserWindow } = require('electron');
+const { ipcMain, BrowserWindow, app } = require('electron');
 const path = require('path');
 const { AppInfo } = require('./app');
 const { CHANNEL_NAME } = require('./constant');
@@ -7,11 +7,14 @@ const { parsePageUrl, isDev } = require('./utils');
 
 const registerMainIPCEvent = () => {
   const appInfo = AppInfo.getInstance();
+
+  // main-window-event
   const mainWindow = appInfo.windowStore.get('mainWindow');
   mainWindow.on('maximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: true }));
   mainWindow.on('unmaximize', () => mainWindow.webContents.send(CHANNEL_NAME.NORMAL.RECEIVE_MESSAGE, { type: 'resize', isMaximized: false }));
+  mainWindow.on('close', () => app.quit());
 
-  // window-event
+  // main-process-event
   ipcMain.handle(CHANNEL_NAME.PRELOAD.MINIMIZE, (event, windowName) => appInfo.windowStore.get(windowName).minimize());
   ipcMain.handle(CHANNEL_NAME.PRELOAD.MAXIMIZE, (event, windowName) => {
     const targetWindow = appInfo.windowStore.get(windowName);
