@@ -1,8 +1,8 @@
 import {
-  CloseOutlined, EditOutlined, MoneyCollectTwoTone, PlusOutlined, RedEnvelopeOutlined, SaveOutlined
+  CloseOutlined, EditOutlined, MoneyCollectTwoTone, PlusOutlined, RedEnvelopeOutlined, SaveOutlined, WarningOutlined
 } from '@ant-design/icons';
 import {
-  Button, Col, Empty, message, Row, Spin
+  Button, Col, Empty, message, Row, Spin, Modal
 } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
@@ -19,6 +19,7 @@ import EditCard from './EditCard';
 import Divider from '../Divider';
 import Ticket from '../Ticket';
 
+const { confirm } = Modal;
 const template = ({
   formatDate, className, subClassName, walletId, walletName
 } = {}) => ({
@@ -112,10 +113,6 @@ export default function RecordDetail() {
   };
 
   const handleSubmit = async () => {
-    if (!tempData.length) {
-      message.info('请先添加数据');
-      return;
-    }
     setLoading(true);
     const { status, data: newRecordData, error } = await updateRecordData(data, tempData, currDate);
     if (status) {
@@ -129,6 +126,23 @@ export default function RecordDetail() {
       setLoading(false);
     } else {
       message.error(error);
+    }
+  };
+
+  const checkHandleSubmit = async () => {
+    if (!tempData.length) {
+      confirm({
+        title: `将清空【${currDate}】数据，是否继续？`,
+        icon: <WarningOutlined />,
+        onOk() {
+          handleSubmit();
+        },
+        onCancel() {
+          return false;
+        }
+      });
+    } else {
+      handleSubmit();
     }
   };
 
@@ -171,7 +185,7 @@ export default function RecordDetail() {
         <Icon tipText="添加" className={innerClassName} onClick={handleAdd}>
           <PlusOutlined />
         </Icon>
-        <Icon tipText="保存" className={innerClassName} onClick={handleSubmit}>
+        <Icon tipText="保存" className={innerClassName} onClick={checkHandleSubmit}>
           <SaveOutlined />
         </Icon>
         <Icon tipText="取消" className={innerClassName} onClick={handleCancel}>
