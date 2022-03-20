@@ -19,9 +19,12 @@ contextBridge.exposeInMainWorld('electron', {
   packageJson,
   ...channelInvoke(),
   SUBSCRIBE: (channel, listener) => {
-    ipcRenderer.on(channel, (event, ...args) => listener(...args));
-  },
-  UNSUBSCRIBE: (channel, listener) => ipcRenderer.removeListener(channel, listener)
+    const subscription = (event, ...args) => listener(...args);
+    // subcribe
+    ipcRenderer.on(channel, subscription);
+    // return unsubcribe function
+    return () => ipcRenderer.removeListener(channel, subscription);
+  }
 });
 
 contextBridge.exposeInMainWorld('nodeFunction', {

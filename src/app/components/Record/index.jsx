@@ -146,9 +146,7 @@ export default function Record({ setLoading }) {
       }
     };
     // receive message from main process
-    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
-    // cancel subscribe
-    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
+    return window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
   }, [fetchRecord]);
 
   return (

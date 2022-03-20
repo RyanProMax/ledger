@@ -65,6 +65,7 @@ export default function RecordDetail() {
   };
 
   const handleCancel = () => {
+    if (!editing) return;
     setEditing(false);
     setTempData([]);
   };
@@ -144,16 +145,14 @@ export default function RecordDetail() {
     const cb = ({ type, data: newData, date }) => {
       if (type === 'data') {
         setData(newData);
-        console.log('newData', newData, date);
         setCurrDate(date);
+        handleCancel();
         setLoading(false);
       }
     };
     // receive message from main process
-    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
-    // cancel subscribe
-    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
-  }, [setData]);
+    return window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
+  }, [handleCancel]);
 
   // 顶部操作栏
   const rednerTopOperation = (innerClassName) => (
@@ -199,7 +198,6 @@ export default function RecordDetail() {
     const date = dayjsDate.date();
     const total = get(data, `statistic[${month - 1}].daily[${currDate}].total`, 0).toFixed(2);
     const isPositive = total >= 0;
-    console.log(dailyList);
     const incomeList = dailyList.filter((x) => x.type === 0);
     const spendingList = dailyList.filter((x) => x.type === 1);
 

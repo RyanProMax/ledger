@@ -22,10 +22,8 @@ export default function SubWindow({
       }
     };
     // receive message from main process
-    window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
-    // cancel subscribe
-    return () => window.electron.UNSUBSCRIBE('RECEIVE_MESSAGE', cb);
-  }, [setIsMaximize]);
+    return window.electron.SUBSCRIBE('RECEIVE_MESSAGE', cb);
+  }, []);
 
   return (
     <div className="ledger-sub-window">
