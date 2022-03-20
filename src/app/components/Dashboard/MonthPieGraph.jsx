@@ -38,7 +38,6 @@ export default function MonthPieGraph({ data }) {
     series: [
       {
         type: 'pie',
-        roseType: 'radius',
         itemStyle: {
           borderRadius: 5
         },
