@@ -1,7 +1,7 @@
 import {
   Input,
   InputNumber,
-  message, Popconfirm, Table, Tag
+  message, Popconfirm, Select, Table, Tag
 } from 'antd';
 import { DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import './index.less';
@@ -54,6 +54,8 @@ export default function Wallet({ setLoading }) {
       id: v4(),
       name: '',
       balance: 0,
+      type: 0,
+      creditLine: 0,
       index: tempData.length
     }]);
   };
@@ -195,6 +197,25 @@ export default function Wallet({ setLoading }) {
           ) : name)}
         />
         <Column
+          title="类型"
+          dataIndex="type"
+          key="type"
+          render={(type, record, index) => (editing ? (
+            <Select
+              defaultValue={type}
+              options={[{ label: '储蓄账户', value: 0 }, { label: '信用账户', value: 1 }]}
+              onChange={(e) => {
+                setTempData((oldData) => {
+                  const newData = [...oldData];
+                  newData[index].type = e;
+                  return newData;
+                });
+              }}
+              size="small"
+            />
+          ) : <Tag color={type === 0 ? 'green' : 'orange'}>{type === 0 ? '储蓄账户' : '信用账户'}</Tag>)}
+        />
+        <Column
           title="余额"
           dataIndex="balance"
           key="balance"
@@ -214,6 +235,43 @@ export default function Wallet({ setLoading }) {
               style={{ width: '100%' }}
             />
           ) : <Tag color={balance < 0 ? 'red' : 'green'}>{balance.toFixed(2)}</Tag>)}
+        />
+        <Column
+          title="信用额度"
+          dataIndex="creditLine"
+          key="creditLine"
+          render={(creditLine, record, index) => {
+            const curData = editing ? tempData : data;
+            if (curData[index].type === 0) return '-';
+            if (!editing) return <Tag color={creditLine < 0 ? 'red' : 'orange'}>{creditLine.toFixed(2)}</Tag>;
+            return (
+              <InputNumber
+                precision={2}
+                controls={false}
+                min={0}
+                value={creditLine}
+                onChange={(val) => {
+                  setTempData((oldData) => {
+                    const newData = [...oldData];
+                    newData[index].creditLine = val;
+                    return newData;
+                  });
+                }}
+                size="small"
+                style={{ width: '100%' }}
+              />
+            );
+          }}
+        />
+        <Column
+          title="信用余额"
+          key="creditBalance"
+          render={(text, record, index) => {
+            const curData = editing ? tempData : data;
+            if (curData[index].type === 0) return '-';
+            const creditBalance = curData[index].balance + curData[index].creditLine;
+            return <Tag color={creditBalance < 0 ? 'red' : 'orange'}>{creditBalance.toFixed(2)}</Tag>;
+          }}
         />
         {editing && (
           <Column
