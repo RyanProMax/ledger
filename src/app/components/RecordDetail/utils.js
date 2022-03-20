@@ -1,6 +1,10 @@
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, differenceBy, get } from 'lodash-es';
+import STORE from '../../../global/Store.json';
 
+/**
+ * @description 更新统计数据
+ */
 export const updateStatistic = (data, dateList) => {
   const newStatistic = cloneDeep(data.statistic);
   dateList.forEach((date) => {
@@ -28,32 +32,89 @@ export const updateStatistic = (data, dateList) => {
   return newStatistic;
 };
 
-export const updateRecordData = (data, list, defaultDate) => {
-  const newRecordData = cloneDeep(data);
-  const toCalculateStatisticDate = new Set();
-
-  // 直接将 list 中与 defaultDate 日期一致的数据迁移过去，同步修改记录（增删改）
-  newRecordData.data[defaultDate] = list.filter((c) => c.formatDate === defaultDate);
-  toCalculateStatisticDate.add(defaultDate);
-
-  // 与 defaultDate 日期不一致的记录，进行覆盖 or 新增
-  list.filter((c) => c.formatDate !== defaultDate).forEach((row) => {
-    const currDate = row.formatDate;
-    if (!newRecordData.data[currDate]) {
-      newRecordData.data[currDate] = [row];
-    } else {
-      const dailyListOfCurrDate = newRecordData.data[currDate];
-      const rowIndex = dailyListOfCurrDate.findIndex((c) => c.id === row.id);
-      if (rowIndex > -1) {
-        dailyListOfCurrDate[rowIndex] = row;
-      } else {
-        dailyListOfCurrDate.push(row);
-      }
+/**
+ * @param oldRecordData 旧 record 数据
+ * @param list 新数据列表
+ * @param defaultDate 编辑日期
+ *
+ * @description 更新 record 数据
+ * 规则：
+ *  1. 与编辑日期一致的数据，进行 diff 比对 -> 计算新增/修改/删除数据 -> 更新对应账号余额
+ *  2. 非编辑日期的数据，进行新增 or 修改 -> 更新对应账号余额
+ */
+export const updateRecordData = async (oldRecordData, list, defaultDate) => {
+  try {
+    const { data: newWalletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME, STORE.WALLET.FILE_NAME);
+    if (error) {
+      return {
+        status: true,
+        error
+      };
     }
-    toCalculateStatisticDate.add(currDate);
-  });
-  // statistic
-  newRecordData.statistic = updateStatistic(newRecordData, toCalculateStatisticDate);
+    const newRecordData = cloneDeep(oldRecordData);
+    const toCalculateStatisticDate = new Set();
 
-  return newRecordData;
+    // 处理 list 中与 defaultDate 日期一致的数据（增删改）
+    toCalculateStatisticDate.add(defaultDate);
+    const newDefaultDateList = list.filter((c) => c.formatDate === defaultDate);
+    const oldDefaultDateList = get(oldRecordData, `data[${defaultDate}]`, []);
+    const decreasedDateList = differenceBy(oldDefaultDateList, newDefaultDateList, (r) => r.id);
+    // 处理删除数据 -> 余额
+    decreasedDateList.forEach((row) => {
+      const wallet = newWalletData.find((w) => w.id === row.walletId);
+      wallet.balance -= row.value;
+    });
+    // 处理新增/修改数据
+    newDefaultDateList.forEach((row) => {
+      const wallet = newWalletData.find((w) => w.id === row.walletId);
+      const oldData = oldDefaultDateList.find((o) => o.id === row.id);
+      // 修改
+      if (oldData) {
+        wallet.balance += (row.value - oldData.value);
+      } else {
+        // 新增
+        wallet.balance += row.value;
+      }
+    });
+    // 覆盖
+    newRecordData.data[defaultDate] = newDefaultDateList;
+
+    // 与 defaultDate 日期不一致的记录，进行覆盖 or 新增
+    list.filter((c) => c.formatDate !== defaultDate).forEach((row) => {
+      const wallet = newWalletData.find((w) => w.id === row.walletId);
+      const currDate = row.formatDate;
+      // 新增
+      if (!newRecordData.data[currDate]) {
+        newRecordData.data[currDate] = [row];
+        wallet.balance += row.value;
+      } else {
+        const dailyListOfCurrDate = newRecordData.data[currDate];
+        const rowIndex = dailyListOfCurrDate.findIndex((c) => c.id === row.id);
+        if (rowIndex > -1) {
+          // 编辑
+          wallet.balance += (row.value - dailyListOfCurrDate[rowIndex].value);
+          dailyListOfCurrDate[rowIndex] = row;
+        } else {
+          // 新增
+          dailyListOfCurrDate.push(row);
+          wallet.balance += row.value;
+        }
+      }
+      toCalculateStatisticDate.add(currDate);
+    });
+    // statistic
+    newRecordData.statistic = updateStatistic(newRecordData, toCalculateStatisticDate);
+    // save wallet Data
+    await window.electron.SET_STORE_DATA({ storeFileName: STORE.WALLET.FILE_NAME, data: newWalletData });
+
+    return {
+      status: true,
+      data: newRecordData
+    };
+  } catch (e) {
+    return {
+      status: false,
+      error: e.message
+    };
+  }
 };

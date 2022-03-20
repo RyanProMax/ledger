@@ -117,15 +117,19 @@ export default function RecordDetail() {
       return;
     }
     setLoading(true);
-    const newRecordData = updateRecordData(data, tempData, currDate);
-    await window.electron.SET_STORE_DATA({
-      storeFileName: `record_${newRecordData.year}.json`,
-      data: newRecordData
-    });
-    setData(newRecordData);
-    setEditing(false);
-    await window.electron.SEND_MESSAGE('mainWindow', { type: 'reload' });
-    setLoading(false);
+    const { status, data: newRecordData, error } = await updateRecordData(data, tempData, currDate);
+    if (status) {
+      await window.electron.SET_STORE_DATA({
+        storeFileName: `record_${newRecordData.year}.json`,
+        data: newRecordData
+      });
+      setData(newRecordData);
+      setEditing(false);
+      await window.electron.SEND_MESSAGE('mainWindow', { type: 'reload' });
+      setLoading(false);
+    } else {
+      message.error(error);
+    }
   };
 
   useEffect(() => {

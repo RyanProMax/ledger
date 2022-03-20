@@ -30,12 +30,11 @@ export default function Wallet({ setLoading }) {
   const sortData = useMemo(() => data.map((row, index) => ({ ...row, index })), [data]);
 
   // 请求数据
-  const fetchWallet = async (force = false) => {
-    if (data.length && !force) return;
+  const fetchWallet = async () => {
     setLoading(true);
     try {
-      const { status, data: walletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME, STORE.WALLET.FILE_NAME);
-      if (!status) {
+      const { data: walletData, error } = await window.electron.GET_STORE_DATA(STORE.WALLET.FILE_NAME, STORE.WALLET.FILE_NAME);
+      if (!error) {
         dispatch({
           type: ACTION_NAME.SET_WALLET,
           data: walletData
@@ -84,7 +83,7 @@ export default function Wallet({ setLoading }) {
         storeFileName: STORE.WALLET.FILE_NAME,
         data: newData
       });
-      await fetchWallet(true);
+      await fetchWallet();
       handleCancel();
     } else {
       message.warn('数据不符合要求，请修改');
