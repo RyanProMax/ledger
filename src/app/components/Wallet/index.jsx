@@ -12,6 +12,7 @@ import {
 import { v4 } from 'uuid';
 import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { arrayMoveImmutable } from 'array-move';
+import { round } from 'lodash-es';
 import { ACTION_NAME, OPERATOR } from '../../constant';
 import STORE from '../../../global/Store.json';
 
@@ -223,18 +224,18 @@ export default function Wallet({ setLoading }) {
             <InputNumber
               precision={2}
               controls={false}
-              value={balance}
+              value={balance / 100}
               onChange={(val) => {
                 setTempData((oldData) => {
                   const newData = [...oldData];
-                  newData[index].balance = val;
+                  newData[index].balance = val * 100;
                   return newData;
                 });
               }}
               size="small"
               style={{ width: '100%' }}
             />
-          ) : <Tag color={balance < 0 ? 'red' : 'green'}>{balance.toFixed(2)}</Tag>)}
+          ) : <Tag color={balance < 0 ? 'red' : 'green'}>{(balance / 100).toFixed(2)}</Tag>)}
         />
         <Column
           title="信用额度"
@@ -243,17 +244,17 @@ export default function Wallet({ setLoading }) {
           render={(creditLine, record, index) => {
             const curData = editing ? tempData : data;
             if (curData[index].type === 0) return '-';
-            if (!editing) return <Tag color={creditLine < 0 ? 'red' : 'orange'}>{creditLine.toFixed(2)}</Tag>;
+            if (!editing) return <Tag color={creditLine < 0 ? 'red' : 'orange'}>{(creditLine / 100).toFixed(2)}</Tag>;
             return (
               <InputNumber
                 precision={2}
                 controls={false}
                 min={0}
-                value={creditLine}
+                value={creditLine / 100}
                 onChange={(val) => {
                   setTempData((oldData) => {
                     const newData = [...oldData];
-                    newData[index].creditLine = val;
+                    newData[index].creditLine = val * 100;
                     return newData;
                   });
                 }}
@@ -270,7 +271,7 @@ export default function Wallet({ setLoading }) {
             const curData = editing ? tempData : data;
             if (curData[index].type === 0) return '-';
             const creditBalance = curData[index].balance + curData[index].creditLine;
-            return <Tag color={creditBalance < 0 ? 'red' : 'orange'}>{creditBalance.toFixed(2)}</Tag>;
+            return <Tag color={creditBalance < 0 ? 'red' : 'orange'}>{(creditBalance / 100).toFixed(2)}</Tag>;
           }}
         />
         {editing && (

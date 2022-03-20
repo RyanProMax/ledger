@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { round } from 'lodash-es';
 import './index.less';
 
 export default function Ticket({
@@ -21,7 +22,7 @@ export default function Ticket({
         )}
       </div>
       <div className="ledger-ticket-mid">
-        <span className="ledger-ticket-mid__value">{Math.abs(value.toFixed(2))}</span>
+        <span className="ledger-ticket-mid__value">{Math.abs(value / 100).toFixed(2)}</span>
       </div>
       <div className="ledger-ticket-bottom">
         <span className="ledger-ticket-bottom__wallet">{ walletName}</span>

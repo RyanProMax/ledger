@@ -64,7 +64,7 @@ export default function Record({ setLoading }) {
     }
   };
 
-  const handleAdd = () => handleSelect(dayjs(selectedDate, 'YYYY-MM-DD'));
+  const handleAdd = () => handleSelect(selectedDate);
 
   const dateCellRender = (value) => {
     const { date, month, formatDate } = formatDateValue(value);
@@ -78,7 +78,7 @@ export default function Record({ setLoading }) {
         })}
         >
           <div className="ledger-record__date-cell-date">{date}</div>
-          {dailyData.length ? (<div className="ledger-record__date-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>) : null}
+          {dailyData.length ? (<div className="ledger-record__date-cell-total">{total >= 0 ? `+ ${total / 100}` : `- ${-total / 100}`}</div>) : null}
         </div>
       </div>
     );
@@ -96,7 +96,7 @@ export default function Record({ setLoading }) {
         })}
         >
           <div className="ledger-record__month-cell-month">{month + 1}</div>
-          {hasData ? (<div className="ledger-record__month-cell-total">{total >= 0 ? `+ ${total}` : `- ${-total}`}</div>) : null}
+          {hasData ? (<div className="ledger-record__month-cell-total">{total >= 0 ? `+ ${total / 100}` : `- ${-total / 100}`}</div>) : null}
         </div>
       </div>
     );

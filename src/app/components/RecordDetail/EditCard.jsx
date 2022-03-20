@@ -44,14 +44,14 @@ export default function EditCard({
         />
         <span className="ledger-record-detail__card-label">金额</span>
         <InputNumber
-          value={value}
+          value={value / 100}
           precision={2}
           controls={false}
           onChange={(val) => {
             if ((type === 0 && val < 0) || (type === 1 && val > 0)) {
-              handleChange({ value: -val });
+              handleChange({ value: -val * 100 });
             } else {
-              handleChange({ value: val });
+              handleChange({ value: val * 100 });
             }
           }}
           size="small"

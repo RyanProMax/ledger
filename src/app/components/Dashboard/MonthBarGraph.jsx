@@ -58,7 +58,7 @@ export default function MonthBarGraph({ data }) {
       {
         name: '支出',
         type: 'bar',
-        data: data.map((c) => Math.abs(c.spending)),
+        data: data.map((c) => Math.abs(c.spending / 100)),
         markPoint: {
           data: [
             {
@@ -74,7 +74,7 @@ export default function MonthBarGraph({ data }) {
         name: '收入',
         type: 'bar',
         yAxisIndex: 1,
-        data: data.map((c) => c.income)
+        data: data.map((c) => c.income / 100)
       }
     ]
   }), [data]);

@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
-import { cloneDeep, differenceBy, get } from 'lodash-es';
+import {
+  cloneDeep, differenceBy, get
+} from 'lodash-es';
 import STORE from '../../../global/Store.json';
 
 /**

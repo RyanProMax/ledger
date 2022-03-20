@@ -18,7 +18,7 @@ module.exports = {
   CLASS: Wallet,
   DATA: [
     new Wallet({ name: '余额宝', type: 0, creditLine: 0 }),
-    new Wallet({ name: '花呗', type: 1, creditLine: 10000 }),
+    new Wallet({ name: '花呗', type: 1, creditLine: 1000000 }),
     new Wallet({ name: '微信', type: 0, creditLine: 0 }),
     new Wallet({ name: '信用卡', type: 0, creditLine: 0 })
   ]

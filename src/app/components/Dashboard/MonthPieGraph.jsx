@@ -16,7 +16,7 @@ export default function MonthPieGraph({ data }) {
       if (!obj[r.className]) obj[r.className] = 0;
       obj[r.className] += Math.abs(r.value);
     });
-    return Object.entries(obj).map(([k, v]) => ({ name: k, value: v })).sort((a, b) => b.value - a.value);
+    return Object.entries(obj).map(([k, v]) => ({ name: k, value: v / 100 })).sort((a, b) => b.value - a.value);
   }, [data, type]);
 
   const option = useMemo(() => ({

@@ -7,7 +7,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 import moment from 'moment';
-import { cloneDeep, get } from 'lodash-es';
+import { cloneDeep, get, round } from 'lodash-es';
 import dayjs from 'dayjs';
 import classnames from 'classnames';
 import SubWindow from '../SubWindow';
@@ -214,7 +214,7 @@ export default function RecordDetail() {
     const dayjsDate = dayjs(currDate, 'YYYY-MM-DD');
     const month = dayjsDate.month() + 1;
     const date = dayjsDate.date();
-    const total = get(data, `statistic[${month - 1}].daily[${currDate}].total`, 0).toFixed(2);
+    const total = get(data, `statistic[${month - 1}].daily[${currDate}].total`, 0);
     const isPositive = total >= 0;
     const incomeList = dailyList.filter((x) => x.type === 0);
     const spendingList = dailyList.filter((x) => x.type === 1);
@@ -236,7 +236,7 @@ export default function RecordDetail() {
           >
             ￥
             {' '}
-            {Math.abs(total)}
+            {Math.abs(total / 100)}
           </div>
         </div>
         {incomeList.length ? (
